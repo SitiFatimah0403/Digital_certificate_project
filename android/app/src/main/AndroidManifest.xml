@@ -1,4 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.digital_certificate_project">
+
     <application
         android:label="digital_certificate_project"
         android:name="${applicationName}"

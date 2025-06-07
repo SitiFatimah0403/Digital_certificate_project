@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "243564777686",
+    "project_id": "authenticationtesting-67e9e",
+    "storage_bucket": "authenticationtesting-67e9e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:243564777686:android:97a2bfcc5cba3e30833977",
+        "android_client_info": {
+          "package_name": "com.example.digital_certificate_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCErfAUsgzmMmxRrSg4zqbsgvEiu7X3Tf8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
