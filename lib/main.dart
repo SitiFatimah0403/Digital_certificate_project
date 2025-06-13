@@ -11,17 +11,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  ); // ensure firebase_options.dart is set up
 
-  final firestore = FirebaseFirestore.instance;
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print("Firebase initialized"); //check if it is successful
+  } catch (e, stackTrace) {
+    print("Error during Firebase init: $e");
+    print(stackTrace);
+  }
 
-  await firestore.collection('users').doc('testuser@example.com').set({
-    'email': 'testuser@example.com',
-    'role': 'recipient',
-    'createdAt': FieldValue.serverTimestamp(),
-  });
   runApp(MyApp());
 }
 
@@ -51,7 +51,24 @@ class MyApp extends StatelessWidget {
 }
 
 class AuthWrapper extends StatelessWidget {
-  final AuthService _authService = AuthService();
+  final AuthService _authService = AuthService(); //to get current logged in user
+
+  Future<String?> getUserRole(User user) async {
+    final docRef = FirebaseFirestore.instance.collection('users').doc(user.email); //access data from firestore db (from user email)
+    final doc = await docRef.get(); //retrieve from firestore 
+
+    if (doc.exists && doc.data() != null && doc.data()!.containsKey('role')) {
+      return doc['role'];
+    } else {
+      // Optional: create the document if not found
+      await docRef.set({
+        'email': user.email,
+        'role': 'recipient', // default role
+        'createdAt': FieldValue.serverTimestamp(), //Auto generate server timestamp
+      });
+      return 'recipient';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,19 +76,31 @@ class AuthWrapper extends StatelessWidget {
 
     if (user == null) {
       return LoginScreen();
-    } else {
-      // TODO: Replace this with actual role fetch from Firestore or backend
-      String role = 'CA'; // Contoh je buat masa ni, Hardcoded for demo (replace later)
-
-      final route = getRedirectRoute(role); //determines which screen to navigate to (based on the role)
-      Future.microtask(() { //ensures navigation is triggered after the widget tree builds
-        Navigator.pushReplacementNamed(context, route);
-      });
-
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+
+    return FutureBuilder<String?>(
+      future: getUserRole(user),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
+        } else if (snapshot.hasError || !snapshot.hasData) {
+          return Scaffold(body: Center(child: Text("Error retrieving user role.")));
+        } else {
+          final role = snapshot.data!;
+          final route = getRedirectRoute(role);
+
+          // Use Future.microtask to navigate after the build
+          Future.microtask(() {
+            Navigator.pushReplacementNamed(context, route);
+          });
+
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+      },
+    );
   }
 }
+
 
 class PlaceholderScreen extends StatelessWidget { //This is a temporary screen to stand in for your future dashboards (like Admin, CA, etc.).
   final String title;
@@ -86,3 +115,4 @@ class PlaceholderScreen extends StatelessWidget { //This is a temporary screen t
     );
   }
 }
+
