@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   static ThemeData lightTheme = ThemeData(
-    primaryColor: Colors.deepPurple,
+    primaryColor: const Color.fromARGB(255, 0, 0, 0),
     scaffoldBackgroundColor: Colors.white,
     textTheme: const TextTheme(
       bodyMedium: TextStyle(
