@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screen/home_screen.dart';
 
 class BottomNavbar extends StatefulWidget {
   const BottomNavbar({super.key});
@@ -9,7 +10,7 @@ class BottomNavbar extends StatefulWidget {
 
 class _BottomNavbarState extends State<BottomNavbar> {
   final appScreens = [
-    Center(child: Text("Home")),
+    HomeScreen(),
     Center(child: Text("Uploads")),
   ];
 
