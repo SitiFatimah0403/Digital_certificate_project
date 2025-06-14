@@ -11,7 +11,7 @@ class BottomNavbar extends StatefulWidget {
 class _BottomNavbarState extends State<BottomNavbar> {
   final appScreens = [
     HomeScreen(),
-    Center(child: Text("Uploads")),
+    Center(child: Text("Uploads")),   //nnti anna navigate through sini
   ];
 
   int _selectedIndex = 0;
@@ -25,11 +25,11 @@ class _BottomNavbarState extends State<BottomNavbar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color(0xB5ABAABB),
-        title: Text("RECIPIENT"),
-        centerTitle: true,
-      ),
+      //appBar: AppBar(
+       // backgroundColor: Color(0xB5ABAABB),
+       // title: Text("RECIPIENT"),
+       // centerTitle: true,
+      //),
       body: appScreens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
@@ -38,15 +38,15 @@ class _BottomNavbarState extends State<BottomNavbar> {
         unselectedItemColor: const Color(0xFF526400),
         showSelectedLabels: false,
         showUnselectedLabels: false,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: "Home"),
+          items: [
+            BottomNavigationBarItem(icon: Icon(Icons.home_outlined),
+                activeIcon: Icon(Icons.home),
+                label: "Home"),
 
-          BottomNavigationBarItem(icon: Icon(Icons.upload_outlined),
-              activeIcon: Icon(Icons.upload_rounded),
-              label: "Uploads"),
-        ],
+            BottomNavigationBarItem(icon: Icon(Icons.upload_outlined),
+                activeIcon: Icon(Icons.upload_rounded),
+                label: "Uploads"),
+          ],
       ),
     );
   }
