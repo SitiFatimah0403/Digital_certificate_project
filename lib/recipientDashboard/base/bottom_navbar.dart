@@ -1,3 +1,4 @@
+import 'package:digital_certificate_project/anna/CA_verification.dart';
 import 'package:flutter/material.dart';
 import '../screen/home_screen.dart';
 
@@ -11,6 +12,7 @@ class BottomNavbar extends StatefulWidget {
 class _BottomNavbarState extends State<BottomNavbar> {
   final appScreens = [
     HomeScreen(),
+    CA_Verification(),
     Center(child: Text("Uploads")),   //nnti anna navigate through sini
   ];
 
