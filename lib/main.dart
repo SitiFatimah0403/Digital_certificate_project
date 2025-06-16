@@ -1,9 +1,10 @@
+import 'package:digital_certificate_project/auth/screens/login_screen';
 import 'package:digital_certificate_project/recipientDashboard/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
-import 'auth/screens/login_screen.dart';
+import 'auth/screens/signin_screen.dart';
 import 'core/constants.dart';
 import 'auth/services/auth_service.dart';
 import 'auth/utils/role_checker.dart'; // Optional: for role-based redirection
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
       home: AuthWrapper(), // controls where to go after startup
       routes: {
         '/login': (context) => LoginScreen(),
+        '/Signup': (context) => SignUpScreen(),
         '/adminDashboard': (context) => PlaceholderScreen('Admin Dashboard'),
         '/caDashboard': (context) => PlaceholderScreen('CA Dashboard'),
         '/recipientDashboard': (context) => HomeScreen(),
