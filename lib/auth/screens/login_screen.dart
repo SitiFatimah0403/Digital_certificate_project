@@ -31,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await firestore.collection('users').add({
         'email': email,
-        'password': password, // ⚠️ Demo only! Don't store plain passwords.
+        'password': password, //Demo only! Don't store plain passwords.
         'created_at': FieldValue.serverTimestamp(),
       });
       ScaffoldMessenger.of(context).showSnackBar(
@@ -165,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Expanded(child: Divider(thickness: 1)),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Text('or continue with'),
+                  child: Text('OR'),
                 ),
                 Expanded(child: Divider(thickness: 1)),
               ],
@@ -191,9 +191,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 minimumSize: Size(double.infinity, 44),
               ),
             ),
-           
-
-           
           ],
         ),
       ),
