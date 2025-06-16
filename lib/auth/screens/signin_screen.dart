@@ -75,6 +75,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               },
               child: Text("Sign Up"),
             ),
+            SizedBox(height: 20),
+            
           ],
         ),
       ),

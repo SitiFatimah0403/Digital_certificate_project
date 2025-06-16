@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
       title: 'Digital Certificate Repository',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
+        primarySwatch: Colors.grey,
       ),
       home: AuthWrapper(), // controls where to go after startup
       routes: {
