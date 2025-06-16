@@ -55,7 +55,7 @@ class AuthWrapper extends StatelessWidget {
 
   Future<String?> getUserRole(User user) async {
     final docRef = FirebaseFirestore.instance.collection('users').doc(user.email); //access data from firestore db (from user email)
-    final doc = await docRef.get(); //retrieve from firestore 
+    final doc = await docRef.get(); //retrieve from firestore
 
     if (doc.exists && doc.data() != null && doc.data()!.containsKey('role')) {
       return doc['role'];
@@ -115,4 +115,3 @@ class PlaceholderScreen extends StatelessWidget { //This is a temporary screen t
     );
   }
 }
-
