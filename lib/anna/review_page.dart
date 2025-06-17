@@ -32,6 +32,7 @@ class ReviewPage extends StatelessWidget {
    ReviewPage({required this.docId, required this.metadata, required this.status});
 
   Future<void> updateStatus(BuildContext context, String newStatus) async {
+  try {
     await FirebaseFirestore.instance
         .collection('truecopies')
         .doc(docId)
@@ -41,7 +42,13 @@ class ReviewPage extends StatelessWidget {
       SnackBar(content: Text('Status updated to $newStatus')),
     );
     Navigator.pop(context);
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to update status: $e')),
+    );
   }
+}
+
 
   void _showConfirmationDialog(BuildContext context, String newStatus) {
   showDialog(
