@@ -3,12 +3,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'signin_screen.dart';
 import '../../Components/round_logo.dart';
 import '../services/auth_service.dart';
+import '../services/firestore_service.dart'; 
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState(); 
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -16,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
   bool passwordVisible = false;
 
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirestoreService firestoreService = FirestoreService();
 
   // Google Sign-In logic
   void _handleGoogleSignIn() async {
@@ -24,23 +27,16 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = await AuthService().signInWithGoogle();
 
       if (user != null) {
-        final snapshot = await firestore
-            .collection('users')
-            .where('email', isEqualTo: user.email)
-            .get();
+        final userData = await firestoreService.getUserByEmail(user.email!);
 
-        if (snapshot.docs.isNotEmpty) {
-          final role = snapshot.docs.first['role'];
+        if (userData != null) {
+          final role = userData['role'];
 
-          if (role == 'recipient') {
-            Navigator.pushReplacementNamed(context, '/recipientDashboard');
-          } else if (role == 'issuer') {
-            Navigator.pushReplacementNamed(context, '/issuerDashboard');
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Unknown user role')),
-            );
-          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Google Sign-In successful!')),
+          );
+
+          Navigator.pushReplacementNamed(context, '/recipientDashboard');
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('No user data found in Firestore')),
@@ -57,43 +53,52 @@ class _LoginScreenState extends State<LoginScreen> {
   // Email/password login
   Future<void> loginUser(String email, String password) async {
     try {
-      final snapshot = await firestore
-          .collection('users')
-          .where('email', isEqualTo: email)
-          .get();
+    // Sign in using Firebase Authentication
+    UserCredential userCredential = await FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: password);
 
-      if (snapshot.docs.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('User not found. Please sign up.')),
-        );
-        return;
-      }
+    final user = userCredential.user;
 
-      final userData = snapshot.docs.first.data();
-      if (userData['password'] == password) {
+    if (user != null) {
+      // Fetch role from Firestore using the signed-in user's UID
+      final userData = await firestoreService.getUserByEmail(email);
+
+      if (userData != null) {
+        final role = userData['role'];
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login successful!')),
         );
 
-        final role = userData['role'];
         if (role == 'recipient') {
           Navigator.pushReplacementNamed(context, '/recipientDashboard');
-        } else if (role == 'issuer') {
-          Navigator.pushReplacementNamed(context, '/issuerDashboard');
         } else {
           Navigator.pushReplacementNamed(context, '/');
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Incorrect password')),
+          SnackBar(content: Text('User role not found in Firestore')),
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed: $e')),
-      );
     }
+  } on FirebaseAuthException catch (e) {
+    String message = 'Login failed';
+
+    if (e.code == 'user-not-found') {
+      message = 'No user found with that email.';
+    } else if (e.code == 'wrong-password') {
+      message = 'Incorrect password.';
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Login failed: $e')),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +118,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             SizedBox(height: 40),
 
-            // Email
             Text('Email', style: TextStyle(color: Colors.grey[700], fontSize: 16)),
             SizedBox(height: 5),
             TextFormField(
@@ -129,7 +133,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             SizedBox(height: 20),
 
-            // Password
             Text('Password', style: TextStyle(color: Colors.grey[700], fontSize: 16)),
             SizedBox(height: 5),
             TextFormField(

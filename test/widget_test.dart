@@ -7,26 +7,9 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:digital_certificate_project/main.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-
-  setUpAll(() async {
-    // Use a mock Firebase Auth
-    final user = MockUser(
-      isAnonymous: false,
-      uid: 'someuid',
-      email: 'test@upm.edu.my',
-      displayName: 'Test User',
-    );
-    final auth = MockFirebaseAuth(mockUser: user);
-
-    // Normally, you'd inject this `auth` into your app or provider
-  });
-
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(MyApp());
 
