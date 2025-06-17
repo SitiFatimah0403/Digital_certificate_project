@@ -10,23 +10,6 @@ import 'auth/services/auth_service.dart';
 import 'auth/utils/role_checker.dart'; // Optional: for role-based redirection
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    print("Firebase initialized"); //check if it is successful
-  } catch (e, stackTrace) {
-    print("Error during Firebase init: $e");
-    print(stackTrace);
-  }
-
-  runApp(MyApp());
-}
-
 class MyApp extends StatelessWidget {
   final AuthService _authService = AuthService();
 
@@ -35,9 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Digital Certificate Repository',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.grey,
-      ),
+      theme: ThemeData(primarySwatch: Colors.grey),
       home: AuthWrapper(), // controls where to go after startup
       routes: {
         '/login': (context) => LoginScreen(),
@@ -45,8 +26,8 @@ class MyApp extends StatelessWidget {
         '/adminDashboard': (context) => PlaceholderScreen('Admin Dashboard'),
         '/caDashboard': (context) => PlaceholderScreen('CA Dashboard'),
         '/recipientDashboard': (context) => HomeScreen(),
-        '/clientDashboard' : (context) => PlaceholderScreen('Client'),
-        '/viewerDashboard' : (context) => PlaceholderScreen('Viewer'),
+        '/clientDashboard': (context) => PlaceholderScreen('Client'),
+        '/viewerDashboard': (context) => PlaceholderScreen('Viewer'),
         '/unauthorized': (context) => PlaceholderScreen('Unauthorized'),
       },
     );
@@ -54,10 +35,13 @@ class MyApp extends StatelessWidget {
 }
 
 class AuthWrapper extends StatelessWidget {
-  final AuthService _authService = AuthService(); //to get current logged in user
+  final AuthService _authService =
+      AuthService(); //to get current logged in user
 
   Future<String?> getUserRole(User user) async {
-    final docRef = FirebaseFirestore.instance.collection('users').doc(user.email); //access data from firestore db (from user email)
+    final docRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.email); //access data from firestore db (from user email)
     final doc = await docRef.get(); //retrieve from firestore
 
     if (doc.exists && doc.data() != null && doc.data()!.containsKey('role')) {
@@ -67,7 +51,8 @@ class AuthWrapper extends StatelessWidget {
       await docRef.set({
         'email': user.email,
         'role': 'recipient', // default role
-        'createdAt': FieldValue.serverTimestamp(), //Auto generate server timestamp
+        'createdAt':
+            FieldValue.serverTimestamp(), //Auto generate server timestamp
       });
       return 'recipient';
     }
@@ -87,7 +72,9 @@ class AuthWrapper extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(body: Center(child: CircularProgressIndicator()));
         } else if (snapshot.hasError || !snapshot.hasData) {
-          return Scaffold(body: Center(child: Text("Error retrieving user role.")));
+          return Scaffold(
+            body: Center(child: Text("Error retrieving user role.")),
+          );
         } else {
           final role = snapshot.data!;
           final route = getRedirectRoute(role);
@@ -104,8 +91,8 @@ class AuthWrapper extends StatelessWidget {
   }
 }
 
-
-class PlaceholderScreen extends StatelessWidget { //This is a temporary screen to stand in for your future dashboards (like Admin, CA, etc.).
+class PlaceholderScreen extends StatelessWidget {
+  //This is a temporary screen to stand in for your future dashboards (like Admin, CA, etc.).
   final String title;
 
   PlaceholderScreen(this.title);
