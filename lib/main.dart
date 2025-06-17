@@ -91,7 +91,7 @@ class AuthWrapper extends StatelessWidget {
       },
     );
   }
-}
+
 
 class PlaceholderScreen extends StatelessWidget {
   //This is a temporary screen to stand in for your future dashboards (like Admin, CA, etc.).
