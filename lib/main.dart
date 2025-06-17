@@ -1,5 +1,5 @@
 import 'package:digital_certificate_project/auth/screens/login_screen';
-import 'package:digital_certificate_project/recipientDashboard/screen/home_screen.dart';
+import 'package:digital_certificate_project/recipientDashboard/base/bottom_navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         '/Signup': (context) => SignUpScreen(),
         '/adminDashboard': (context) => PlaceholderScreen('Admin Dashboard'),
         '/caDashboard': (context) => PlaceholderScreen('CA Dashboard'),
-        '/recipientDashboard': (context) => HomeScreen(),
+        '/recipientDashboard': (context) => BottomNavbar(),  //recipient's navbar
         '/clientDashboard' : (context) => PlaceholderScreen('Client'),
         '/viewerDashboard' : (context) => PlaceholderScreen('Viewer'),
         '/unauthorized': (context) => PlaceholderScreen('Unauthorized'),
