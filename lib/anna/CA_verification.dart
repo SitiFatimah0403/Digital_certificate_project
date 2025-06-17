@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+//to import ain punya
+import '../recipient_upload_cert/upload_cert.dart';
 
 void main() => runApp(DigitalCertificateApp());
 
@@ -126,7 +128,12 @@ class _CAVerificationState extends State<CA_Verification> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => UploadScreen()),
+          );
+        },
         child: Icon(Icons.add),
       ),
     );

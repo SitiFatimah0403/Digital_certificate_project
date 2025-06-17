@@ -169,71 +169,73 @@ class _UploadScreenState extends State<UploadScreen> {
         backgroundColor: Colors.black,
         iconTheme: IconThemeData(color: Colors.white),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center, // center vertically
-          children: [
-            SizedBox(height: 100),
-            ElevatedButton(
-              onPressed: () => pickFile(isImage: true),
-              child: Text("Upload Image"),
-            ),
-            ElevatedButton(
-              onPressed: () => pickFile(isImage: false),
-              child: Text("Upload PDF"),
-            ),
-            SizedBox(height: 10),
-            Text(fileName != null ? "Selected: $fileName" : status),
-
-            if (metadataExtracted) ...[
-              SizedBox(height: 20),
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(labelText: "Full Name"),
-              ),
-              TextField(
-                controller: orgController,
-                decoration: InputDecoration(labelText: "Organization"),
-              ),
-              TextField(
-                controller: docTypeController,
-                decoration: InputDecoration(labelText: "Document Type"),
-              ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Issued: ${issueDate != null ? issueDate!.toLocal().toString().split(' ')[0] : 'Not set'}",
-                  ),
-                  ElevatedButton(
-                    onPressed: () => pickDate(context, true),
-                    child: Text("Select Issue Date"),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Expiry: ${expiryDate != null ? expiryDate!.toLocal().toString().split(' ')[0] : 'Not set'}",
-                  ),
-                  ElevatedButton(
-                    onPressed: () => pickDate(context, false),
-                    child: Text("Select Expiry Date"),
-                  ),
-                ],
-              ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: uploadAndSave,
-                child: Text("Submit & Upload"),
+                onPressed: () => pickFile(isImage: true),
+                child: Text("Upload Image"),
               ),
+              ElevatedButton(
+                onPressed: () => pickFile(isImage: false),
+                child: Text("Upload PDF"),
+              ),
+              SizedBox(height: 10),
+              Text(fileName != null ? "Selected: $fileName" : status),
+              if (metadataExtracted) ...[
+                SizedBox(height: 20),
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(labelText: "Full Name"),
+                ),
+                TextField(
+                  controller: orgController,
+                  decoration: InputDecoration(labelText: "Organization"),
+                ),
+                TextField(
+                  controller: docTypeController,
+                  decoration: InputDecoration(labelText: "Document Type"),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Issued: ${issueDate != null ? issueDate!.toLocal().toString().split(' ')[0] : 'Not set'}",
+                    ),
+                    ElevatedButton(
+                      onPressed: () => pickDate(context, true),
+                      child: Text("Select Issue Date"),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Expiry: ${expiryDate != null ? expiryDate!.toLocal().toString().split(' ')[0] : 'Not set'}",
+                    ),
+                    ElevatedButton(
+                      onPressed: () => pickDate(context, false),
+                      child: Text("Select Expiry Date"),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: uploadAndSave,
+                  child: Text("Submit & Upload"),
+                ),
+              ],
+              SizedBox(height: 10),
             ],
-            SizedBox(height: 10),
-          ],
+          ),
         ),
       ),
     );
