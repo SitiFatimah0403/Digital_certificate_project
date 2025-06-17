@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'firestore_service.dart';
 
-
+// Shows a banner for pending documents
 class StatusBanner extends StatelessWidget {
   final String status;
 
@@ -26,6 +26,7 @@ class StatusBanner extends StatelessWidget {
   }
 }
 
+// Review screen to approve or reject a certificate
 class ReviewPage extends StatefulWidget {
   final String docId;
   final Map<String, dynamic> metadata;
@@ -47,27 +48,27 @@ class _ReviewPageState extends State<ReviewPage> {
 
   final FirestoreService _firestoreService = FirestoreService();
 
-
+  // Updates the document status in Firestore using the service class
   Future<void> updateStatus(BuildContext context, String newStatus) async {
-  setState(() => isLoading = true);
+    setState(() => isLoading = true);
 
-  try {
-    await _firestoreService.updateCertificateStatus(widget.docId, newStatus);
+    try {
+      await _firestoreService.updateCertificateStatus(widget.docId, newStatus);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Status updated to $newStatus')),
-    );
-    Navigator.pop(context);
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Failed to update status: $e')),
-    );
-  } finally {
-    setState(() => isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Status updated to $newStatus')),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update status: $e')),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
-}
 
-
+  // Ask user to confirm before changing the document status
   void _showConfirmationDialog(BuildContext context, String newStatus) {
     showDialog(
       context: context,
@@ -135,6 +136,7 @@ class _ReviewPageState extends State<ReviewPage> {
   }
 }
 
+// Renders certificate metadata in key-value format
 class MetadataSection extends StatelessWidget {
   final Map<String, dynamic> metadata;
 
