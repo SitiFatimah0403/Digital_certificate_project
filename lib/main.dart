@@ -1,4 +1,5 @@
 import 'package:digital_certificate_project/auth/screens/login_screen';
+import 'package:digital_certificate_project/recipientDashboard/base/bottom_navbar.dart';
 import 'package:digital_certificate_project/recipientDashboard/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -9,22 +10,6 @@ import 'core/constants.dart';
 import 'auth/services/auth_service.dart';
 import 'auth/utils/role_checker.dart'; // Optional: for role-based redirection
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    print("Firebase initialized"); //check if it is successful
-  } catch (e, stackTrace) {
-    print("Error during Firebase init: $e");
-    print(stackTrace);
-  }
-
-  runApp(MyApp());
-}
 
 class MyApp extends StatelessWidget {
   final AuthService _authService = AuthService();
@@ -41,7 +26,7 @@ class MyApp extends StatelessWidget {
         '/Signup': (context) => SignUpScreen(),
         '/adminDashboard': (context) => PlaceholderScreen('Admin Dashboard'),
         '/caDashboard': (context) => PlaceholderScreen('CA Dashboard'),
-        '/recipientDashboard': (context) => HomeScreen(),
+        '/recipientDashboard': (context) => BottomNavbar(),
         '/clientDashboard': (context) => PlaceholderScreen('Client'),
         '/viewerDashboard': (context) => PlaceholderScreen('Viewer'),
         '/unauthorized': (context) => PlaceholderScreen('Unauthorized'),
@@ -52,9 +37,10 @@ class MyApp extends StatelessWidget {
 
 class AuthWrapper extends StatelessWidget {
   final AuthService _authService =
+
       AuthService(); //to get current logged in user
 
-  Future<String?> getUserRole(User user) async {
+      AuthService();
     final docRef = FirebaseFirestore.instance
         .collection('users')
         .doc(user.email); //access data from firestore db (from user email)

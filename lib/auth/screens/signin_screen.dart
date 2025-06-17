@@ -1,5 +1,8 @@
+import 'package:digital_certificate_project/Components/round_logo.dart';
+import 'package:digital_certificate_project/auth/models/user_model.dart';
+import 'package:digital_certificate_project/auth/services/firestore_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -11,34 +14,53 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final firestore = FirebaseFirestore.instance;
+  final FirestoreService firestoreService = FirestoreService();
+  bool passwordVisible = false;
 
   Future<void> signUpUser(String email, String password) async {
     try {
-      // Check if user already exists
-      final existing = await firestore
-          .collection('users')
-          .where('email', isEqualTo: email)
-          .get();
-
-      if (existing.docs.isNotEmpty) {
+      if (!email.endsWith('@student.upm.edu.my')) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('User already exists. Please login.')),
+          SnackBar(content: Text('Only @student.upm.edu.my emails are allowed')),
         );
         return;
       }
 
-      await firestore.collection('users').add({
-        'email': email,
-        'password': password,
-        'created_at': FieldValue.serverTimestamp(),
-      });
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      final firebaseUser = userCredential.user;
+
+      if (firebaseUser != null) {
+        final newUser = AppUser(
+          uid: firebaseUser.uid,
+          email: email,
+          password: password,
+          role: 'recipient',
+        );
+
+        await firestoreService.saveUser(newUser);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Signup successful! Please log in.')),
+        );
+
+        Navigator.pop(context);
+      }
+    } on FirebaseAuthException catch (e) {
+      String message = 'Signup failed';
+
+      if (e.code == 'email-already-in-use') {
+        message = 'Email already in use. Please log in.';
+      } else if (e.code == 'invalid-email') {
+        message = 'Invalid email format.';
+      } else if (e.code == 'weak-password') {
+        message = 'Password should be at least 6 characters.';
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Signup successful! Please log in.')),
+        SnackBar(content: Text(message)),
       );
-
-      Navigator.pop(context); // Go back to login
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Signup failed: $e')),
@@ -49,34 +71,74 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(title: Text("Sign Up")),
-      body: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
+      body: SafeArea(
+        child: ListView(
+          padding: EdgeInsets.symmetric(horizontal: 30),
           children: [
-            TextField(
+            SizedBox(height: 50),
+           const Center(
+            child: RoundLogoWidget(
+              size: 80,
+              fontSize: 14,
+              label: 'TrustCert',
+               ),
+              ),
+            SizedBox(height: 40),
+
+            Text('Email', style: TextStyle(color: Colors.grey[700], fontSize: 16)),
+            SizedBox(height: 5),
+            TextFormField(
               controller: emailController,
-              decoration: InputDecoration(labelText: "Email"),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: passwordController,
-              decoration: InputDecoration(labelText: "Password"),
-              obscureText: true,
+              decoration: InputDecoration(
+                hintText: 'Enter your email',
+                filled: true,
+                fillColor: Colors.grey[100],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
             ),
             SizedBox(height: 20),
+
+            Text('Password', style: TextStyle(color: Colors.grey[700], fontSize: 16)),
+            SizedBox(height: 5),
+            TextFormField(
+              controller: passwordController,
+              obscureText: !passwordVisible,
+              decoration: InputDecoration(
+                hintText: 'Enter your password',
+                filled: true,
+                fillColor: Colors.grey[100],
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
+                suffixIcon: IconButton(
+                  icon: Icon(passwordVisible ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () => setState(() => passwordVisible = !passwordVisible),
+                ),
+              ),
+            ),
+            SizedBox(height: 30),
+
             ElevatedButton(
               onPressed: () {
                 final email = emailController.text.trim();
-                final password = passwordController.text;
+                final password = passwordController.text.trim();
                 if (email.isNotEmpty && password.isNotEmpty) {
                   signUpUser(email, password);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Please enter all fields')),
+                  );
                 }
               },
-              child: Text("Sign Up"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                minimumSize: Size(double.infinity, 44),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: Text('Sign Up', style: TextStyle(color: Colors.white)),
             ),
-            SizedBox(height: 20),
-            
           ],
         ),
       ),

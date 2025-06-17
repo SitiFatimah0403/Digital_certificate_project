@@ -30,10 +30,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  firebase_core: ^2.27.0
+  firebase_core: ^2.24.0
   firebase_auth: ^4.16.0
   google_sign_in: ^6.2.1
-  cloud_firestore: ^4.15.7
+  cloud_firestore: ^4.14.0
   #start sini semua pasal design for login page
   auto_size_text: 3.0.0
   cached_network_image: 3.4.1
@@ -75,6 +75,14 @@ dependencies:
   url_launcher_platform_interface: 2.3.2
   url_launcher_web: 2.3.3
   url_launcher_windows: 3.1.2
+  #untuk file upload, JANGAN UBAH KEDUDUKAN NI!
+  file_picker: ^8.1.4
+  image_picker: ^1.0.7
+  uuid: ^4.0.0
+  syncfusion_flutter_pdf: ^24.2.3
+  firebase_storage: ^11.6.5
+
+
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -83,7 +91,7 @@ dependencies:
 
 dev_dependencies:
   mockito: ^5.4.4
-  firebase_auth_mocks: ^0.13.0
+  #firebase_auth_mocks: ^0.13.0
   flutter_test:
     sdk: flutter
 
