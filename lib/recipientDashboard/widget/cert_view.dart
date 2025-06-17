@@ -77,7 +77,7 @@ class CertCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'Received on: $receivedDate',
-                  style: const TextStyle(fontSize: 14),
+                  style: const TextStyle(fontSize: 10),
                 ),
               ],
             ),

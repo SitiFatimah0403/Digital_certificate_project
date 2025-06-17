@@ -11,6 +11,14 @@ import 'auth/services/auth_service.dart';
 import 'auth/utils/role_checker.dart'; // Optional: for role-based redirection
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(MyApp());
+}
+
 class MyApp extends StatelessWidget {
   final AuthService _authService = AuthService();
 
@@ -21,15 +29,17 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.grey),
       home: AuthWrapper(), // controls where to go after startup
+
+
+
       routes: {
         '/login': (context) => LoginScreen(),
         '/Signup': (context) => SignUpScreen(),
         '/adminDashboard': (context) => PlaceholderScreen('Admin Dashboard'),
         '/caDashboard': (context) => PlaceholderScreen('CA Dashboard'),
-        '/recipientDashboard': (context) => BottomNavbar(),
+        '/recipientDashboard': (context) => HomeScreen(),
         '/clientDashboard': (context) => PlaceholderScreen('Client'),
         '/viewerDashboard': (context) => PlaceholderScreen('Viewer'),
-        '/unauthorized': (context) => PlaceholderScreen('Unauthorized'),
       },
     );
   }
@@ -37,28 +47,51 @@ class MyApp extends StatelessWidget {
 
 class AuthWrapper extends StatelessWidget {
   final AuthService _authService =
-
-      AuthService(); //to get current logged in user
-
       AuthService();
-    final docRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.email); //access data from firestore db (from user email)
-    final doc = await docRef.get(); //retrieve from firestore
 
-    if (doc.exists && doc.data() != null && doc.data()!.containsKey('role')) {
-      return doc['role'];
+  AuthWrapper({super.key}); //to get current logged in user
+
+  Future<String?> getUserRole(User user) async {
+  try {
+    final email = user.email;
+    print('1)📧 Checking role for user: $email');
+
+    final docRef = FirebaseFirestore.instance.collection('users').doc(email);
+    final doc = await docRef.get();
+
+    if (doc.exists) {
+      print('2)📄 Document exists: ${doc.data()}');
+
+      if (doc.data() != null && doc.data()!.containsKey('role')) {
+        print('3)✅ Role found: ${doc['role']}');
+        return doc['role'];
+      } else {
+        print('⚠️ Document found but no role field.');
+      }
     } else {
-      // Optional: create the document if not found
-      await docRef.set({
-        'email': user.email,
-        'role': 'recipient', // default role
-        'createdAt':
-            FieldValue.serverTimestamp(), //Auto generate server timestamp
-      });
-      return 'recipient';
+      print('🚫 Document does NOT exist. Creating new user with role "recipient".');
     }
+
+    // Create default user document if not found or missing role
+    await docRef.set({
+      'email': email,
+      'role': 'recipient',
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+
+    return 'recipient';
+  } catch (e, stackTrace) {
+    print('🔥 Exception in getUserRole: $e');
+    print('📄 Stack trace: $stackTrace');
+    return null;
   }
+}
+
+//to sign out
+Future<void> signOut() async {
+  await FirebaseAuth.instance.signOut();
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -68,28 +101,29 @@ class AuthWrapper extends StatelessWidget {
       return LoginScreen();
     }
 
-    return FutureBuilder<String?>(
-      future: getUserRole(user),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(body: Center(child: CircularProgressIndicator()));
-        } else if (snapshot.hasError || !snapshot.hasData) {
-          return Scaffold(
-            body: Center(child: Text("Error retrieving user role.")),
-          );
-        } else {
-          final role = snapshot.data!;
-          final route = getRedirectRoute(role);
+ return FutureBuilder<String?>(
+  future: getUserRole(user),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
+    } else if (snapshot.hasError || !snapshot.hasData) {
+      print('🔥 Error getting user role: ${snapshot.error}');
+      print('📄 Stack trace: ${snapshot.stackTrace}');
+      return Scaffold(
+        body: Center(child: Text("Error retrieving user role.")),
+      );
+    } else {
+      final role = snapshot.data!;
+      final route = getRedirectRoute(role);
 
-          // Use Future.microtask to navigate after the build
-          Future.microtask(() {
-            Navigator.pushReplacementNamed(context, route);
-          });
+      Future.microtask(() {
+        Navigator.pushReplacementNamed(context, route);
+      });
 
-          return Scaffold(body: Center(child: CircularProgressIndicator()));
-        }
-      },
-    );
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+  },
+);
   }
 
 

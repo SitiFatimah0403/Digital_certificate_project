@@ -4,13 +4,11 @@ String getRedirectRoute(String role) {
       return '/adminDashboard';
     case 'CA':
       return '/caDashboard';
-    case 'Recipient':
-      return '/recipientDashboard';
     case 'Client' :
       return '/clientDashboard';
     case 'Viewer' :
       return '/viewerDashboard';
     default:
-      return '/unauthorized';
+      return '/recipientDashboard';
   }
 }

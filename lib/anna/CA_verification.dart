@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 //to import ain punya, kena import ni
 import '../recipient_upload_cert/upload_cert.dart';
 
-void main() => runApp(DigitalCertificateApp());
+//void main() => runApp(DigitalCertificateApp());
 
 class DigitalCertificateApp extends StatelessWidget {
   @override
