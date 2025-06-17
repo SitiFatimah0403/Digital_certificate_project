@@ -1,4 +1,4 @@
-import 'package:digital_certificate_project/anna/CA_verification.dart';
+import 'package:digital_certificate_project/recipient_verify_cert/CA_verification.dart';
 import 'package:flutter/material.dart';
 import '../screen/home_screen.dart';
 

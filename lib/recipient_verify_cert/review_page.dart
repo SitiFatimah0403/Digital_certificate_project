@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'firestore_service.dart';
+
 
 class StatusBanner extends StatelessWidget {
   final String status;
@@ -43,27 +45,28 @@ class ReviewPage extends StatefulWidget {
 class _ReviewPageState extends State<ReviewPage> {
   bool isLoading = false;
 
+  final FirestoreService _firestoreService = FirestoreService();
+
+
   Future<void> updateStatus(BuildContext context, String newStatus) async {
-    setState(() => isLoading = true);
+  setState(() => isLoading = true);
 
-    try {
-      await FirebaseFirestore.instance
-          .collection('truecopies')
-          .doc(widget.docId)
-          .update({'status': newStatus.toLowerCase()});
+  try {
+    await _firestoreService.updateCertificateStatus(widget.docId, newStatus);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Status updated to $newStatus')),
-      );
-      Navigator.pop(context);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update status: $e')),
-      );
-    } finally {
-      setState(() => isLoading = false);
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Status updated to $newStatus')),
+    );
+    Navigator.pop(context);
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to update status: $e')),
+    );
+  } finally {
+    setState(() => isLoading = false);
   }
+}
+
 
   void _showConfirmationDialog(BuildContext context, String newStatus) {
     showDialog(
