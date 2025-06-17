@@ -47,21 +47,27 @@ class MyApp extends StatelessWidget {
 
 class AuthWrapper extends StatelessWidget {
   final AuthService _authService =
-
-      AuthService(); //to get current logged in user
-
       AuthService();
 
   AuthWrapper({super.key}); //to get current logged in user
 
   Future<String?> getUserRole(User user) async {
-    final docRef = FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.email); //access data from firestore db (from user email)
-    final doc = await docRef.get(); //retrieve from firestore
+  try {
+    final email = user.email;
+    print('📧 Checking role for user: $email');
 
-    if (doc.exists && doc.data() != null && doc.data()!.containsKey('role')) {
-      return doc['role'];
+    final docRef = FirebaseFirestore.instance.collection('users').doc(email);
+    final doc = await docRef.get();
+
+    if (doc.exists) {
+      print('📄 Document exists: ${doc.data()}');
+
+      if (doc.data() != null && doc.data()!.containsKey('role')) {
+        print('✅ Role found: ${doc['role']}');
+        return doc['role'];
+      } else {
+        print('⚠️ Document found but no role field.');
+      }
     } else {
       print('🚫 Document does NOT exist. Creating new user with role "recipient".');
     }
