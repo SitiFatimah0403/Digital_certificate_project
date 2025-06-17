@@ -54,16 +54,16 @@ class AuthWrapper extends StatelessWidget {
   Future<String?> getUserRole(User user) async {
   try {
     final email = user.email;
-    print('📧 Checking role for user: $email');
+    print('1)📧 Checking role for user: $email');
 
     final docRef = FirebaseFirestore.instance.collection('users').doc(email);
     final doc = await docRef.get();
 
     if (doc.exists) {
-      print('📄 Document exists: ${doc.data()}');
+      print('2)📄 Document exists: ${doc.data()}');
 
       if (doc.data() != null && doc.data()!.containsKey('role')) {
-        print('✅ Role found: ${doc['role']}');
+        print('3)✅ Role found: ${doc['role']}');
         return doc['role'];
       } else {
         print('⚠️ Document found but no role field.');
