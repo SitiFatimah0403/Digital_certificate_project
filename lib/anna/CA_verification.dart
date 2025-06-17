@@ -128,7 +128,12 @@ class _CAVerificationState extends State<CA_Verification> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => UploadScreen()),
+          );
+        },
         child: Icon(Icons.add),
       ),
     );
