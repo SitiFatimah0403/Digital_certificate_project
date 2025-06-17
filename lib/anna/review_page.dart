@@ -1,6 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+class StatusBanner extends StatelessWidget {
+  final String status;
+
+  const StatusBanner({required this.status, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (status.toLowerCase() != 'pending') return SizedBox.shrink();
+
+    return Container(
+      padding: EdgeInsets.all(8),
+      color: Colors.grey.shade300,
+      child: Row(
+        children: [
+          Icon(Icons.warning, color: Colors.orange),
+          SizedBox(width: 8),
+          Text('Status: Pending Approval'),
+        ],
+      ),
+    );
+  }
+}
+
 class ReviewPage extends StatelessWidget {
   final String docId;
   final Map<String, dynamic> metadata;
@@ -29,24 +52,10 @@ class ReviewPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (status.toLowerCase() == 'pending')
-              Container(
-                padding: EdgeInsets.all(8),
-                color: Colors.grey.shade300,
-                child: Row(
-                  children: [
-                    Icon(Icons.warning, color: Colors.orange),
-                    SizedBox(width: 8),
-                    Text('Status: Pending Approval'),
-                  ],
-                ),
-              ),
+            StatusBanner(status: status),
+
             SizedBox(height: 20),
-            Text('Name: ${metadata['name'] ?? ''}'),
-            Text('Issued Organisation: ${metadata['organization'] ?? ''}'),
-            Text('Title: ${metadata['document_type'] ?? ''}'),
-            Text('Date Issued: ${metadata['date_issued']?.split('T')?.first ?? ''}'),
-            Text('Expiry Date: ${metadata['expiry_date']?.split('T')?.first ?? ''}'),
+            MetadataSection(metadata: metadata),
             SizedBox(height: 20),
             Row(
               children: [
@@ -73,3 +82,29 @@ class ReviewPage extends StatelessWidget {
     );
   }
 }
+
+class MetadataSection extends StatelessWidget {
+  final Map<String, dynamic> metadata;
+
+  const MetadataSection({required this.metadata, super.key});
+
+  String formatDate(String? iso) {
+    if (iso == null) return '';
+    return iso.split('T').first;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Name: ${metadata['name'] ?? ''}'),
+        Text('Issued Organisation: ${metadata['organization'] ?? ''}'),
+        Text('Title: ${metadata['document_type'] ?? ''}'),
+        Text('Date Issued: ${formatDate(metadata['date_issued'])}'),
+        Text('Expiry Date: ${formatDate(metadata['expiry_date'])}'),
+      ],
+    );
+  }
+}
+
