@@ -13,7 +13,6 @@ class _BottomNavbarState extends State<BottomNavbar> {
   final appScreens = [
     HomeScreen(),
     CA_Verification(),
-    Center(child: Text("Uploads")),   //nnti anna navigate through sini
   ];
 
   int _selectedIndex = 0;
