@@ -29,7 +29,22 @@ class ReviewPage extends StatelessWidget {
   final Map<String, dynamic> metadata;
   final String status;
 
-  ReviewPage({required this.docId, required this.metadata, required this.status});
+   ReviewPage({
+    String? docId,
+    Map<String, dynamic>? metadata,
+    String? status,
+    Key? key,
+  })  : docId = docId ?? 'dummyDocId123',
+        metadata = metadata ??
+            {
+              'name': 'Jane Doe',
+              'organization': 'Test University',
+              'document_type': 'Bachelor Degree',
+              'date_issued': '2023-06-15T00:00:00',
+              'expiry_date': '2028-06-15T00:00:00',
+            },
+        status = status ?? 'pending',
+        super(key: key);
 
   Future<void> updateStatus(BuildContext context, String newStatus) async {
     await FirebaseFirestore.instance
