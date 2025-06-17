@@ -15,29 +15,41 @@ class _CAVerificationState extends State<CA_Verification> {
   final bool useDummyData = true;
 
   final List<Map<String, dynamic>> dummyDocuments = [
-    {
-      'id': 'doc1',
-      'metadata': {
-        'name': 'Alice Johnson',
-        'document_type': 'Diploma',
-        'date_issued': '2024-05-01T00:00:00',
-        'expiry_date': '2029-05-01T00:00:00',
-        'organization': 'Example University'
-      },
-      'status': 'pending',
+  {
+    'id': 'doc1',
+    'metadata': {
+      'name': 'Ayda Bin Jebat',
+      'document_type': 'Diploma',
+      'date_issued': '2024-05-01T00:00:00',
+      'expiry_date': '2029-05-01T00:00:00',
+      'organization': 'Example University'
     },
-    {
-      'id': 'doc2',
-      'metadata': {
-        'name': 'Bob Smith',
-        'document_type': 'Certificate',
-        'date_issued': '2023-04-20T00:00:00',
-        'expiry_date': '2028-04-20T00:00:00',
-        'organization': 'Institute of Testing'
-      },
-      'status': 'approved',
+    'status': 'pending',
+  },
+  {
+    'id': 'doc2',
+    'metadata': {
+      'name': 'Khairul Binti Amin',
+      'document_type': 'Certificate',
+      'date_issued': '2023-04-20T00:00:00',
+      'expiry_date': '2028-04-20T00:00:00',
+      'organization': 'Institute of Testing'
     },
-  ];
+    'status': 'approved',
+  },
+  {
+    'id': 'doc3',
+    'metadata': {
+      'name': 'Justin Bin Abdullah Bieber',
+      'document_type': 'Transcript',
+      'date_issued': '2022-01-10T00:00:00',
+      'expiry_date': '2027-01-10T00:00:00',
+      'organization': 'Tech University'
+    },
+    'status': 'rejected',
+  },
+];
+
 
   Stream<QuerySnapshot> getDocumentsStream() {
     var collection = FirebaseFirestore.instance.collection('truecopies');
