@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../recipient_upload_cert/upload_cert.dart';
 import 'review_page.dart';
 
+// This screen is for CA to verify and review submitted certificates
 class CA_Verification extends StatefulWidget {
   @override
   _CAVerificationState createState() => _CAVerificationState();
@@ -11,46 +12,47 @@ class CA_Verification extends StatefulWidget {
 class _CAVerificationState extends State<CA_Verification> {
   String selectedStatus = 'All';
 
-  // 🔁 Toggle this to use dummy or real Firestore data
+  // Toggle between dummy data and real Firestore
   final bool useDummyData = true;
 
+  // Sample certificates for testing without database connection
   final List<Map<String, dynamic>> dummyDocuments = [
-  {
-    'id': 'doc1',
-    'metadata': {
-      'name': 'Ayda Bin Jebat',
-      'document_type': 'Diploma',
-      'date_issued': '2024-05-01T00:00:00',
-      'expiry_date': '2029-05-01T00:00:00',
-      'organization': 'Example University'
+    {
+      'id': 'doc1',
+      'metadata': {
+        'name': 'Ayda Bin Jebat',
+        'document_type': 'Diploma',
+        'date_issued': '2024-05-01T00:00:00',
+        'expiry_date': '2029-05-01T00:00:00',
+        'organization': 'Example University'
+      },
+      'status': 'pending',
     },
-    'status': 'pending',
-  },
-  {
-    'id': 'doc2',
-    'metadata': {
-      'name': 'Khairul Binti Amin',
-      'document_type': 'Certificate',
-      'date_issued': '2023-04-20T00:00:00',
-      'expiry_date': '2028-04-20T00:00:00',
-      'organization': 'Institute of Testing'
+    {
+      'id': 'doc2',
+      'metadata': {
+        'name': 'Khairul Binti Amin',
+        'document_type': 'Certificate',
+        'date_issued': '2023-04-20T00:00:00',
+        'expiry_date': '2028-04-20T00:00:00',
+        'organization': 'Institute of Testing'
+      },
+      'status': 'approved',
     },
-    'status': 'approved',
-  },
-  {
-    'id': 'doc3',
-    'metadata': {
-      'name': 'Justin Bin Abdullah Bieber',
-      'document_type': 'Transcript',
-      'date_issued': '2022-01-10T00:00:00',
-      'expiry_date': '2027-01-10T00:00:00',
-      'organization': 'Tech University'
+    {
+      'id': 'doc3',
+      'metadata': {
+        'name': 'Justin Bin Abdullah Bieber',
+        'document_type': 'Transcript',
+        'date_issued': '2022-01-10T00:00:00',
+        'expiry_date': '2027-01-10T00:00:00',
+        'organization': 'Tech University'
+      },
+      'status': 'rejected',
     },
-    'status': 'rejected',
-  },
-];
+  ];
 
-
+  // Firestore query for live documents (used if useDummyData is false)
   Stream<QuerySnapshot> getDocumentsStream() {
     var collection = FirebaseFirestore.instance.collection('truecopies');
     if (selectedStatus == 'All') {
@@ -63,6 +65,7 @@ class _CAVerificationState extends State<CA_Verification> {
     }
   }
 
+  // Assign colors based on document status
   Color getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'approved':
@@ -78,7 +81,7 @@ class _CAVerificationState extends State<CA_Verification> {
   Widget build(BuildContext context) {
     final filters = ['All', 'Pending', 'Approved', 'Rejected'];
 
-    // ✅ Dummy filtering logic
+    // Filter dummy docs based on selected status
     final filteredDocs = selectedStatus == 'All'
         ? dummyDocuments
         : dummyDocuments
@@ -94,6 +97,7 @@ class _CAVerificationState extends State<CA_Verification> {
       ),
       body: Column(
         children: [
+          // Status filter chips
           Wrap(
             spacing: 8,
             children: filters.map((status) {
@@ -104,6 +108,7 @@ class _CAVerificationState extends State<CA_Verification> {
               );
             }).toList(),
           ),
+          // Display either dummy or real document list
           Expanded(
             child: useDummyData
                 ? ListView.builder(
@@ -151,6 +156,7 @@ class _CAVerificationState extends State<CA_Verification> {
           ),
         ],
       ),
+      // Upload button (used for testing or future expansion)
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
             context, MaterialPageRoute(builder: (_) => UploadScreen())),
@@ -159,6 +165,7 @@ class _CAVerificationState extends State<CA_Verification> {
     );
   }
 
+  // Renders one certificate row with metadata and a review button
   Widget buildListTile({
     required String docId,
     required Map<String, dynamic> metadata,
@@ -191,8 +198,7 @@ class _CAVerificationState extends State<CA_Verification> {
                   ),
                 );
               },
-              child:
-                  Text('REVIEW >', style: TextStyle(color: Colors.blue)),
+              child: Text('REVIEW >', style: TextStyle(color: Colors.blue)),
             ),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -211,6 +217,7 @@ class _CAVerificationState extends State<CA_Verification> {
     );
   }
 }
+
 
 extension StringExtension on String {
   String capitalize() => '${this[0].toUpperCase()}${substring(1)}';
