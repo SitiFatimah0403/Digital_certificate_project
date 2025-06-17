@@ -43,6 +43,33 @@ class ReviewPage extends StatelessWidget {
     Navigator.pop(context);
   }
 
+  void _showConfirmationDialog(BuildContext context, String newStatus) {
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: Text('Confirm $newStatus'),
+      content: Text('Are you sure you want to mark this certificate as "$newStatus"?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context), // cancel
+          child: Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context); // close dialog
+            updateStatus(context, newStatus); // proceed
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: newStatus == 'Approved' ? Colors.green : Colors.red,
+          ),
+          child: Text('Yes, $newStatus'),
+        ),
+      ],
+    ),
+  );
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,7 +88,7 @@ class ReviewPage extends StatelessWidget {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () => updateStatus(context, 'Approved'),
+                    onPressed: () => _showConfirmationDialog(context, 'Approved'),
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
                     child: Text('Approve'),
                   ),
@@ -69,7 +96,7 @@ class ReviewPage extends StatelessWidget {
                 SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () => updateStatus(context, 'Rejected'),
+                    onPressed: () => _showConfirmationDialog(context, 'Rejected'),
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                     child: Text('Reject'),
                   ),
