@@ -66,6 +66,15 @@ class _CAVerificationState extends State<CA_Verification> {
   Widget build(BuildContext context) {
     final filters = ['All', 'Pending', 'Approved', 'Rejected'];
 
+    // ✅ Dummy filtering logic
+    final filteredDocs = selectedStatus == 'All'
+        ? dummyDocuments
+        : dummyDocuments
+            .where((doc) =>
+                doc['status'].toString().toLowerCase() ==
+                selectedStatus.toLowerCase())
+            .toList();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Certification Approval Dashboard'),
@@ -86,9 +95,9 @@ class _CAVerificationState extends State<CA_Verification> {
           Expanded(
             child: useDummyData
                 ? ListView.builder(
-                    itemCount: dummyDocuments.length,
+                    itemCount: filteredDocs.length,
                     itemBuilder: (context, index) {
-                      final doc = dummyDocuments[index];
+                      final doc = filteredDocs[index];
                       final metadata = doc['metadata'];
                       final status = doc['status'];
 
@@ -131,7 +140,8 @@ class _CAVerificationState extends State<CA_Verification> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => UploadScreen())),
+        onPressed: () => Navigator.push(
+            context, MaterialPageRoute(builder: (_) => UploadScreen())),
         child: Icon(Icons.add),
       ),
     );
@@ -169,7 +179,8 @@ class _CAVerificationState extends State<CA_Verification> {
                   ),
                 );
               },
-              child: Text('REVIEW >', style: TextStyle(color: Colors.blue)),
+              child:
+                  Text('REVIEW >', style: TextStyle(color: Colors.blue)),
             ),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -177,7 +188,10 @@ class _CAVerificationState extends State<CA_Verification> {
                 color: getStatusColor(status),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(status.capitalize(), style: TextStyle(color: Colors.white)),
+              child: Text(
+                status.capitalize(),
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
