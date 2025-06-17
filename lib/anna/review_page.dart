@@ -24,95 +24,110 @@ class StatusBanner extends StatelessWidget {
   }
 }
 
-class ReviewPage extends StatelessWidget {
+class ReviewPage extends StatefulWidget {
   final String docId;
   final Map<String, dynamic> metadata;
   final String status;
 
-   ReviewPage({required this.docId, required this.metadata, required this.status});
+  const ReviewPage({
+    required this.docId,
+    required this.metadata,
+    required this.status,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  _ReviewPageState createState() => _ReviewPageState();
+}
+
+class _ReviewPageState extends State<ReviewPage> {
+  bool isLoading = false;
 
   Future<void> updateStatus(BuildContext context, String newStatus) async {
-  try {
-    await FirebaseFirestore.instance
-        .collection('truecopies')
-        .doc(docId)
-        .update({'status': newStatus.toLowerCase()});
+    setState(() => isLoading = true);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Status updated to $newStatus')),
-    );
-    Navigator.pop(context);
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Failed to update status: $e')),
-    );
+    try {
+      await FirebaseFirestore.instance
+          .collection('truecopies')
+          .doc(widget.docId)
+          .update({'status': newStatus.toLowerCase()});
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Status updated to $newStatus')),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update status: $e')),
+      );
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
-}
-
 
   void _showConfirmationDialog(BuildContext context, String newStatus) {
-  showDialog(
-    context: context,
-    builder: (_) => AlertDialog(
-      title: Text('Confirm $newStatus'),
-      content: Text('Are you sure you want to mark this certificate as "$newStatus"?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context), // cancel
-          child: Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context); // close dialog
-            updateStatus(context, newStatus); // proceed
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: newStatus == 'Approved' ? Colors.green : Colors.red,
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('Confirm $newStatus'),
+        content: Text('Are you sure you want to mark this certificate as "$newStatus"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
           ),
-          child: Text('Yes, $newStatus'),
-        ),
-      ],
-    ),
-  );
-}
-
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              updateStatus(context, newStatus);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: newStatus == 'Approved' ? Colors.green : Colors.red,
+            ),
+            child: Text('Yes, $newStatus'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Review Certificate Document')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            StatusBanner(status: status),
-
-            SizedBox(height: 20),
-            MetadataSection(metadata: metadata),
-            SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => _showConfirmationDialog(context, 'Approved'),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                    child: Text('Approve'),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  StatusBanner(status: widget.status),
+                  SizedBox(height: 20),
+                  MetadataSection(metadata: widget.metadata),
+                  SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => _showConfirmationDialog(context, 'Approved'),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                          child: Text('Approve'),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => _showConfirmationDialog(context, 'Rejected'),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                          child: Text('Reject'),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => _showConfirmationDialog(context, 'Rejected'),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                    child: Text('Reject'),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -141,4 +156,3 @@ class MetadataSection extends StatelessWidget {
     );
   }
 }
-
