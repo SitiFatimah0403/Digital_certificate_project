@@ -11,6 +11,34 @@ class CA_Verification extends StatefulWidget {
 class _CAVerificationState extends State<CA_Verification> {
   String selectedStatus = 'All';
 
+  // 🔁 Toggle this to use dummy or real Firestore data
+  final bool useDummyData = true;
+
+  final List<Map<String, dynamic>> dummyDocuments = [
+    {
+      'id': 'doc1',
+      'metadata': {
+        'name': 'Alice Johnson',
+        'document_type': 'Diploma',
+        'date_issued': '2024-05-01T00:00:00',
+        'expiry_date': '2029-05-01T00:00:00',
+        'organization': 'Example University'
+      },
+      'status': 'pending',
+    },
+    {
+      'id': 'doc2',
+      'metadata': {
+        'name': 'Bob Smith',
+        'document_type': 'Certificate',
+        'date_issued': '2023-04-20T00:00:00',
+        'expiry_date': '2028-04-20T00:00:00',
+        'organization': 'Institute of Testing'
+      },
+      'status': 'approved',
+    },
+  ];
+
   Stream<QuerySnapshot> getDocumentsStream() {
     var collection = FirebaseFirestore.instance.collection('truecopies');
     if (selectedStatus == 'All') {
@@ -56,72 +84,103 @@ class _CAVerificationState extends State<CA_Verification> {
             }).toList(),
           ),
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: getDocumentsStream(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
-                final docs = snapshot.data!.docs;
+            child: useDummyData
+                ? ListView.builder(
+                    itemCount: dummyDocuments.length,
+                    itemBuilder: (context, index) {
+                      final doc = dummyDocuments[index];
+                      final metadata = doc['metadata'];
+                      final status = doc['status'];
 
-                if (docs.isEmpty) return Center(child: Text("No documents found."));
+                      return buildListTile(
+                        docId: doc['id'],
+                        metadata: metadata,
+                        status: status,
+                      );
+                    },
+                  )
+                : StreamBuilder<QuerySnapshot>(
+                    stream: getDocumentsStream(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(child: CircularProgressIndicator());
+                      }
 
-                return ListView.builder(
-                  itemCount: docs.length,
-                  itemBuilder: (context, index) {
-                    final doc = docs[index];
-                    final metadata = doc['metadata'] ?? {};
-                    final status = (doc['status'] ?? 'pending_approval').toString();
+                      final docs = snapshot.data!.docs;
+                      if (docs.isEmpty) {
+                        return Center(child: Text("No documents found."));
+                      }
 
-                    return Card(
-                      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      child: ListTile(
-                        title: Text(metadata['name'] ?? 'Unknown'),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(metadata['document_type'] ?? ''),
-                            Text(metadata['date_issued']?.split('T')?.first ?? '')
-                          ],
-                        ),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => ReviewPage(
-                                      docId: doc.id,
-                                      metadata: metadata,
-                                      status: status,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Text('REVIEW >', style: TextStyle(color: Colors.blue)),
-                            ),
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: getStatusColor(status),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(status.capitalize(), style: TextStyle(color: Colors.white)),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
+                      return ListView.builder(
+                        itemCount: docs.length,
+                        itemBuilder: (context, index) {
+                          final doc = docs[index];
+                          final metadata = doc['metadata'] ?? {};
+                          final status = (doc['status'] ?? 'pending').toString();
+
+                          return buildListTile(
+                            docId: doc.id,
+                            metadata: metadata,
+                            status: status,
+                          );
+                        },
+                      );
+                    },
+                  ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => UploadScreen())),
         child: Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget buildListTile({
+    required String docId,
+    required Map<String, dynamic> metadata,
+    required String status,
+  }) {
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: ListTile(
+        title: Text(metadata['name'] ?? 'Unknown'),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(metadata['document_type'] ?? ''),
+            Text(metadata['date_issued']?.split('T')?.first ?? '')
+          ],
+        ),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ReviewPage(
+                      docId: docId,
+                      metadata: metadata,
+                      status: status,
+                    ),
+                  ),
+                );
+              },
+              child: Text('REVIEW >', style: TextStyle(color: Colors.blue)),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: getStatusColor(status),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(status.capitalize(), style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
       ),
     );
   }
