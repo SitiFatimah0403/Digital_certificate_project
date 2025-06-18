@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
         '/Signup': (context) => SignUpScreen(),
         '/adminDashboard': (context) => PlaceholderScreen('Admin Dashboard'),
         '/caDashboard': (context) => PlaceholderScreen('CA Dashboard'),
-        '/recipientDashboard': (context) => HomeScreen(),
+        '/recipientDashboard': (context) => BottomNavbar(),
         '/clientDashboard': (context) => PlaceholderScreen('Client'),
         '/viewerDashboard': (context) => PlaceholderScreen('Viewer'),
       },

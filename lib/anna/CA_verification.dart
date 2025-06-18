@@ -87,39 +87,41 @@ class _CAVerificationState extends State<CA_Verification> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [Text(doc['title']!), Text(doc['date']!)],
                     ),
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ReviewPage(doc: doc),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            'REVIEW >',
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: getStatusColor(doc['status']!),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            doc['status']!,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
+trailing: Row(
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    TextButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ReviewPage(doc: doc),
+          ),
+        );
+      },
+      child: Text(
+        'REVIEW',
+        style: TextStyle(color: Colors.blue),
+      ),
+    ),
+    SizedBox(width: 8),
+    Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 4,
+      ),
+      decoration: BoxDecoration(
+        color: getStatusColor(doc['status']!),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        doc['status']!,
+        style: TextStyle(color: Colors.white),
+      ),
+    ),
+  ],
+),
+
                   ),
                 );
               },
