@@ -1,4 +1,5 @@
 import 'package:digital_certificate_project/auth/screens/login_screen.dart';
+import 'package:digital_certificate_project/certificate_authorityDashboard/ca_screen.dart';
 import 'package:digital_certificate_project/recipient_verify_cert/CA_verification.dart';
 //import 'package:digital_certificate_project/auth/screens/login_screen';
 //import 'package:digital_certificate_project/client/client_detail.dart';
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginScreen(),
         '/Signup': (context) => SignUpScreen(),
         '/adminDashboard': (context) => PlaceholderScreen('Admin Dashboard'),
-        '/caDashboard': (context) => PlaceholderScreen('CA Dashboard'),
+        '/caDashboard': (context) => CertificateApp(),
         '/recipientDashboard': (context) => BottomNavbar(),
         '/clientDashboard': (context) => PlaceholderScreen('Client'),
         '/viewerDashboard': (context) => PlaceholderScreen('Viewer'),

@@ -54,8 +54,8 @@ void _handleGoogleSignIn() async {
         // Navigate to appropriate dashboard based on role
         if (role == 'recipient') {
           Navigator.pushReplacementNamed(context, '/recipientDashboard');
-        } else if (role == 'admin') {
-          Navigator.pushReplacementNamed(context, '/adminDashboard'); //nanti tukar sini 
+        } else if (role == 'CA') {
+          Navigator.pushReplacementNamed(context, '/caDashboard'); 
         } else {
           Navigator.pushReplacementNamed(context, '/'); //nanti add sini lagi
         }
