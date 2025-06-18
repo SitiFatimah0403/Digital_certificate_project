@@ -13,7 +13,7 @@ class _CAVerificationState extends State<CA_Verification> {
   String selectedStatus = 'All';
 
   // Toggle between dummy data and real Firestore
-  final bool useDummyData = true;
+  final bool useDummyData = false;
 
   // Sample certificates for testing without database connection
   final List<Map<String, dynamic>> dummyDocuments = [
@@ -24,7 +24,7 @@ class _CAVerificationState extends State<CA_Verification> {
         'document_type': 'Diploma',
         'date_issued': '2024-05-01T00:00:00',
         'expiry_date': '2029-05-01T00:00:00',
-        'organization': 'Example University'
+        'organization': 'Example University',
       },
       'status': 'pending',
     },
@@ -35,7 +35,7 @@ class _CAVerificationState extends State<CA_Verification> {
         'document_type': 'Certificate',
         'date_issued': '2023-04-20T00:00:00',
         'expiry_date': '2028-04-20T00:00:00',
-        'organization': 'Institute of Testing'
+        'organization': 'Institute of Testing',
       },
       'status': 'approved',
     },
@@ -46,7 +46,7 @@ class _CAVerificationState extends State<CA_Verification> {
         'document_type': 'Transcript',
         'date_issued': '2022-01-10T00:00:00',
         'expiry_date': '2027-01-10T00:00:00',
-        'organization': 'Tech University'
+        'organization': 'Tech University',
       },
       'status': 'rejected',
     },
@@ -82,13 +82,16 @@ class _CAVerificationState extends State<CA_Verification> {
     final filters = ['All', 'Pending', 'Approved', 'Rejected'];
 
     // Filter dummy docs based on selected status
-    final filteredDocs = selectedStatus == 'All'
-        ? dummyDocuments
-        : dummyDocuments
-            .where((doc) =>
-                doc['status'].toString().toLowerCase() ==
-                selectedStatus.toLowerCase())
-            .toList();
+    final filteredDocs =
+        selectedStatus == 'All'
+            ? dummyDocuments
+            : dummyDocuments
+                .where(
+                  (doc) =>
+                      doc['status'].toString().toLowerCase() ==
+                      selectedStatus.toLowerCase(),
+                )
+                .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -100,66 +103,72 @@ class _CAVerificationState extends State<CA_Verification> {
           // Status filter chips
           Wrap(
             spacing: 8,
-            children: filters.map((status) {
-              return ChoiceChip(
-                label: Text(status),
-                selected: selectedStatus == status,
-                onSelected: (_) => setState(() => selectedStatus = status),
-              );
-            }).toList(),
+            children:
+                filters.map((status) {
+                  return ChoiceChip(
+                    label: Text(status),
+                    selected: selectedStatus == status,
+                    onSelected: (_) => setState(() => selectedStatus = status),
+                  );
+                }).toList(),
           ),
           // Display either dummy or real document list
           Expanded(
-            child: useDummyData
-                ? ListView.builder(
-                    itemCount: filteredDocs.length,
-                    itemBuilder: (context, index) {
-                      final doc = filteredDocs[index];
-                      final metadata = doc['metadata'];
-                      final status = doc['status'];
+            child:
+                useDummyData
+                    ? ListView.builder(
+                      itemCount: filteredDocs.length,
+                      itemBuilder: (context, index) {
+                        final doc = filteredDocs[index];
+                        final metadata = doc['metadata'];
+                        final status = doc['status'];
 
-                      return buildListTile(
-                        docId: doc['id'],
-                        metadata: metadata,
-                        status: status,
-                      );
-                    },
-                  )
-                : StreamBuilder<QuerySnapshot>(
-                    stream: getDocumentsStream(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return Center(child: CircularProgressIndicator());
-                      }
+                        return buildListTile(
+                          docId: doc['id'],
+                          metadata: metadata,
+                          status: status,
+                        );
+                      },
+                    )
+                    : StreamBuilder<QuerySnapshot>(
+                      stream: getDocumentsStream(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(child: CircularProgressIndicator());
+                        }
 
-                      final docs = snapshot.data!.docs;
-                      if (docs.isEmpty) {
-                        return Center(child: Text("No documents found."));
-                      }
+                        final docs = snapshot.data!.docs;
+                        if (docs.isEmpty) {
+                          return Center(child: Text("No documents found."));
+                        }
 
-                      return ListView.builder(
-                        itemCount: docs.length,
-                        itemBuilder: (context, index) {
-                          final doc = docs[index];
-                          final metadata = doc['metadata'] ?? {};
-                          final status = (doc['status'] ?? 'pending').toString();
+                        return ListView.builder(
+                          itemCount: docs.length,
+                          itemBuilder: (context, index) {
+                            final doc = docs[index];
+                            final metadata = doc['metadata'] ?? {};
+                            final status =
+                                (doc['status'] ?? 'pending').toString();
 
-                          return buildListTile(
-                            docId: doc.id,
-                            metadata: metadata,
-                            status: status,
-                          );
-                        },
-                      );
-                    },
-                  ),
+                            return buildListTile(
+                              docId: doc.id,
+                              metadata: metadata,
+                              status: status,
+                            );
+                          },
+                        );
+                      },
+                    ),
           ),
         ],
       ),
       // Upload button (used for testing or future expansion)
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(
-            context, MaterialPageRoute(builder: (_) => UploadScreen())),
+        onPressed:
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => UploadScreen()),
+            ),
         child: Icon(Icons.add),
       ),
     );
@@ -179,7 +188,7 @@ class _CAVerificationState extends State<CA_Verification> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(metadata['document_type'] ?? ''),
-            Text(metadata['date_issued']?.split('T')?.first ?? '')
+            Text(metadata['date_issued']?.split('T')?.first ?? ''),
           ],
         ),
         trailing: Column(
@@ -190,11 +199,12 @@ class _CAVerificationState extends State<CA_Verification> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => ReviewPage(
-                      docId: docId,
-                      metadata: metadata,
-                      status: status,
-                    ),
+                    builder:
+                        (_) => ReviewPage(
+                          docId: docId,
+                          metadata: metadata,
+                          status: status,
+                        ),
                   ),
                 );
               },
@@ -217,7 +227,6 @@ class _CAVerificationState extends State<CA_Verification> {
     );
   }
 }
-
 
 extension StringExtension on String {
   String capitalize() => '${this[0].toUpperCase()}${substring(1)}';
