@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'firestore_service.dart';
+import 'package:digital_certificate_project/recipient_verify_cert/widget/metadata_section.dart';
 
 // Shows a banner for pending documents
 class StatusBanner extends StatelessWidget {
@@ -55,14 +56,14 @@ class _ReviewPageState extends State<ReviewPage> {
     try {
       await _firestoreService.updateCertificateStatus(widget.docId, newStatus);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Status updated to $newStatus')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Status updated to $newStatus')));
       Navigator.pop(context);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update status: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to update status: $e')));
     } finally {
       setState(() => isLoading = false);
     }
@@ -72,26 +73,30 @@ class _ReviewPageState extends State<ReviewPage> {
   void _showConfirmationDialog(BuildContext context, String newStatus) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text('Confirm $newStatus'),
-        content: Text('Are you sure you want to mark this certificate as "$newStatus"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              updateStatus(context, newStatus);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: newStatus == 'Approved' ? Colors.green : Colors.red,
+      builder:
+          (_) => AlertDialog(
+            title: Text('Confirm $newStatus'),
+            content: Text(
+              'Are you sure you want to mark this certificate as "$newStatus"?',
             ),
-            child: Text('Yes, $newStatus'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  updateStatus(context, newStatus);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      newStatus == 'Approved' ? Colors.green : Colors.red,
+                ),
+                child: Text('Yes, $newStatus'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -99,65 +104,55 @@ class _ReviewPageState extends State<ReviewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Review Certificate Document')),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  StatusBanner(status: widget.status),
-                  SizedBox(height: 20),
-                  MetadataSection(metadata: widget.metadata),
-                  SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => _showConfirmationDialog(context, 'Approved'),
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                          child: Text('Approve'),
+      body:
+          isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    StatusBanner(status: widget.status),
+                    SizedBox(height: 20),
+                    MetadataSection(metadata: widget.metadata),
+                    SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed:
+                                () => _showConfirmationDialog(
+                                  context,
+                                  'Approved',
+                                ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                            ),
+                            child: Text('Approve'),
+                          ),
                         ),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => _showConfirmationDialog(context, 'Rejected'),
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                          child: Text('Reject'),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed:
+                                () => _showConfirmationDialog(
+                                  context,
+                                  'Rejected',
+                                ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                            ),
+                            child: Text('Reject'),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
     );
   }
 }
 
-// Renders certificate metadata in key-value format
-class MetadataSection extends StatelessWidget {
-  final Map<String, dynamic> metadata;
 
-  const MetadataSection({required this.metadata, super.key});
 
-  String formatDate(String? iso) {
-    if (iso == null) return '';
-    return iso.split('T').first;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Name: ${metadata['name'] ?? ''}'),
-        Text('Issued Organisation: ${metadata['organization'] ?? ''}'),
-        Text('Title: ${metadata['document_type'] ?? ''}'),
-        Text('Date Issued: ${formatDate(metadata['date_issued'])}'),
-        Text('Expiry Date: ${formatDate(metadata['expiry_date'])}'),
-      ],
-    );
-  }
-}
