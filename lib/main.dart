@@ -1,6 +1,9 @@
+import 'package:digital_certificate_project/recipient_verify_cert/CA_verification.dart';
 import 'package:digital_certificate_project/auth/screens/login_screen';
+import 'package:digital_certificate_project/client/client_detail.dart';
 import 'package:digital_certificate_project/recipientDashboard/base/bottom_navbar.dart';
 import 'package:digital_certificate_project/recipientDashboard/screen/home_screen.dart';
+import 'package:digital_certificate_project/recipient_verify_cert/CA_verification.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,9 +16,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(MyApp());
 }
 
@@ -29,9 +30,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.grey),
       home: AuthWrapper(), // controls where to go after startup
-
-
-
       routes: {
         '/login': (context) => LoginScreen(),
         '/Signup': (context) => SignUpScreen(),
@@ -46,52 +44,52 @@ class MyApp extends StatelessWidget {
 }
 
 class AuthWrapper extends StatelessWidget {
-  final AuthService _authService =
-      AuthService();
+  final AuthService _authService = AuthService();
 
   AuthWrapper({super.key}); //to get current logged in user
 
   Future<String?> getUserRole(User user) async {
-  try {
-    final email = user.email;
-    print('1)📧 Checking role for user: $email');
+    try {
+      final email = user.email;
+      print('1)📧 Checking role for user: $email');
 
-    final docRef = FirebaseFirestore.instance.collection('users').doc(email);
-    final doc = await docRef.get();
+      final docRef = FirebaseFirestore.instance.collection('users').doc(email);
+      final doc = await docRef.get();
 
-    if (doc.exists) {
-      print('2)📄 Document exists: ${doc.data()}');
+      if (doc.exists) {
+        print('2)📄 Document exists: ${doc.data()}');
 
-      if (doc.data() != null && doc.data()!.containsKey('role')) {
-        print('3)✅ Role found: ${doc['role']}');
-        return doc['role'];
+        if (doc.data() != null && doc.data()!.containsKey('role')) {
+          print('3)✅ Role found: ${doc['role']}');
+          return doc['role'];
+        } else {
+          print('⚠️ Document found but no role field.');
+        }
       } else {
-        print('⚠️ Document found but no role field.');
+        print(
+          '🚫 Document does NOT exist. Creating new user with role "recipient".',
+        );
       }
-    } else {
-      print('🚫 Document does NOT exist. Creating new user with role "recipient".');
+
+      // Create default user document if not found or missing role
+      await docRef.set({
+        'email': email,
+        'role': 'recipient',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      return 'recipient';
+    } catch (e, stackTrace) {
+      print('🔥 Exception in getUserRole: $e');
+      print('📄 Stack trace: $stackTrace');
+      return null;
     }
-
-    // Create default user document if not found or missing role
-    await docRef.set({
-      'email': email,
-      'role': 'recipient',
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-
-    return 'recipient';
-  } catch (e, stackTrace) {
-    print('🔥 Exception in getUserRole: $e');
-    print('📄 Stack trace: $stackTrace');
-    return null;
   }
-}
 
-//to sign out
-Future<void> signOut() async {
-  await FirebaseAuth.instance.signOut();
-}
-
+  //to sign out
+  Future<void> signOut() async {
+    await FirebaseAuth.instance.signOut();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,29 +99,29 @@ Future<void> signOut() async {
       return LoginScreen();
     }
 
- return FutureBuilder<String?>(
-  future: getUserRole(user),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
-    } else if (snapshot.hasError || !snapshot.hasData) {
-      print('🔥 Error getting user role: ${snapshot.error}');
-      print('📄 Stack trace: ${snapshot.stackTrace}');
-      return Scaffold(
-        body: Center(child: Text("Error retrieving user role.")),
-      );
-    } else {
-      final role = snapshot.data!;
-      final route = getRedirectRoute(role);
+    return FutureBuilder<String?>(
+      future: getUserRole(user),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
+        } else if (snapshot.hasError || !snapshot.hasData) {
+          print('🔥 Error getting user role: ${snapshot.error}');
+          print('📄 Stack trace: ${snapshot.stackTrace}');
+          return Scaffold(
+            body: Center(child: Text("Error retrieving user role.")),
+          );
+        } else {
+          final role = snapshot.data!;
+          final route = getRedirectRoute(role);
 
-      Future.microtask(() {
-        Navigator.pushReplacementNamed(context, route);
-      });
+          Future.microtask(() {
+            Navigator.pushReplacementNamed(context, route);
+          });
 
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
-  },
-);
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+      },
+    );
   }
 }
 
