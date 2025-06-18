@@ -13,7 +13,7 @@ class _CAVerificationState extends State<CA_Verification> {
   String selectedStatus = 'All';
 
   // Toggle between dummy data and real Firestore
-  final bool useDummyData = false;
+  final bool useDummyData = true;
 
   // Sample certificates for testing without database connection
   final List<Map<String, dynamic>> dummyDocuments = [
