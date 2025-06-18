@@ -13,7 +13,7 @@ class _CAVerificationState extends State<CA_Verification> {
   String selectedStatus = 'All';
 
   // Toggle between dummy data and real Firestore
-  final bool useDummyData = true;
+  final bool useDummyData = false;
 
   // Sample certificates for testing without database connection
   final List<Map<String, dynamic>> dummyDocuments = [
@@ -192,38 +192,38 @@ class _CAVerificationState extends State<CA_Verification> {
           ],
         ),
         trailing: Row(
-  mainAxisSize: MainAxisSize.min,
-  children: [
-    TextButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ReviewPage(
-              docId: docId,
-              metadata: metadata,
-              status: status,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (_) => ReviewPage(
+                          docId: docId,
+                          metadata: metadata,
+                          status: status,
+                        ),
+                  ),
+                );
+              },
+              child: Text('REVIEW', style: TextStyle(color: Colors.blue)),
             ),
-          ),
-        );
-      },
-      child: Text('REVIEW', style: TextStyle(color: Colors.blue)),
-    ),
-    SizedBox(width: 8),
-    Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: getStatusColor(status),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        status.capitalize(),
-        style: TextStyle(color: Colors.white),
-      ),
-    ),
-  ],
-),
-
+            SizedBox(width: 8),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: getStatusColor(status),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                status.capitalize(),
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
