@@ -89,6 +89,7 @@ class _UploadScreenState extends State<UploadScreen> {
           selectedFile = File(picked.path);
           fileName = picked.name;
           status = "✅ Image selected. Please enter metadata manually.";
+          metadataExtracted = false; // ✅ ADDED HERE
         });
       }
     } else {

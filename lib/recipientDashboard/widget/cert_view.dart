@@ -23,7 +23,8 @@ class CertView extends StatelessWidget {
                 ),
               );
             },
-            certImage: const NetworkImage('https://via.placeholder.com/100'),
+            certImage: null,
+            //certImage: const NetworkImage('https://via.placeholder.com/100'),
           ),
         );
       }),
@@ -36,14 +37,14 @@ class CertCard extends StatelessWidget {
   final String certName;
   final String receivedDate;
   final VoidCallback onMorePressed;
-  final ImageProvider certImage;
+  final ImageProvider? certImage;
 
   const CertCard({
     super.key,
     required this.certName,
     required this.receivedDate,
     required this.onMorePressed,
-    required this.certImage,
+    this.certImage,
   });
 
   @override
@@ -58,8 +59,12 @@ class CertCard extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundImage: certImage,
             radius: 30,
+            backgroundColor: Colors.grey[300],
+            backgroundImage: certImage,
+            child: certImage == null
+                ? const Icon(Icons.person, size: 30, color: Colors.black54)
+                : null,
           ),
           const SizedBox(width: 16),
           Expanded(
