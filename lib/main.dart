@@ -1,5 +1,6 @@
+import 'package:digital_certificate_project/auth/screens/login_screen.dart';
 import 'package:digital_certificate_project/recipient_verify_cert/CA_verification.dart';
-import 'package:digital_certificate_project/auth/screens/login_screen';
+//import 'package:digital_certificate_project/auth/screens/login_screen';
 //import 'package:digital_certificate_project/client/client_detail.dart';
 import 'package:digital_certificate_project/recipientDashboard/base/bottom_navbar.dart';
 import 'package:digital_certificate_project/recipientDashboard/screen/home_screen.dart';

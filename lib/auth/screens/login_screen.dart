@@ -22,33 +22,56 @@ class _LoginScreenState extends State<LoginScreen> {
   final FirestoreService firestoreService = FirestoreService();
 
   // Google Sign-In logic
-  void _handleGoogleSignIn() async {
-    try {
-      final user = await AuthService().signInWithGoogle();
+void _handleGoogleSignIn() async {
+  try {
+    final user = await AuthService().signInWithGoogle();
 
-      if (user != null) {
-        final userData = await firestoreService.getUserByEmail(user.email!);
+    if (user != null) {
+      final uid = user.uid;
+      final email = user.email!;
 
-        if (userData != null) {
-          final role = userData['role'];
+      // Check if the user already exists in Firestore
+      final existingUser = await firestoreService.getUserByUid(uid);
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Google Sign-In successful!')),
-          );
-
-          Navigator.pushReplacementNamed(context, '/recipientDashboard');
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('No user data found in Firestore')),
-          );
-        }
+      if (existingUser == null) {
+        // If not, save new user with default role
+        await FirebaseFirestore.instance.collection('users').doc(uid).set({
+          'uid': uid,
+          'email': email,
+          'role': 'recipient', // You can change this default role as needed
+          'createdAt': FieldValue.serverTimestamp(),
+        });
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Google Sign-In failed: $e')),
-      );
+
+      // Get the role from Firestore
+      final role = await firestoreService.getUserRole(email);
+
+      if (role != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Google Sign-In successful!')),
+        );
+
+        // Navigate to appropriate dashboard based on role
+        if (role == 'recipient') {
+          Navigator.pushReplacementNamed(context, '/recipientDashboard');
+        } else if (role == 'admin') {
+          Navigator.pushReplacementNamed(context, '/adminDashboard'); //nanti tukar sini 
+        } else {
+          Navigator.pushReplacementNamed(context, '/'); //nanti add sini lagi
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('User role not found in Firestore')),
+        );
+      }
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Google Sign-In failed: $e')),
+    );
   }
+}
+
 
   // Email/password login
   Future<void> loginUser(String email, String password) async {

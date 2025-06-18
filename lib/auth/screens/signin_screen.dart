@@ -61,11 +61,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
       );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Signup failed: $e')),
-      );
-    }
+    } catch (e, stackTrace) {
+  print('🔥 Signup error: $e');
+  print('📄 Stack trace: $stackTrace');
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('Signup failed: $e')),
+  );
+}
   }
 
   @override

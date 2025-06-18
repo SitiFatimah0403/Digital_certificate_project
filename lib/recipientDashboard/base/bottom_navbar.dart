@@ -35,8 +35,8 @@ class _BottomNavbarState extends State<BottomNavbar> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.blueGrey,
-        unselectedItemColor: const Color(0xFF526400),
+        selectedItemColor: const Color.fromARGB(255, 89, 90, 90),
+        unselectedItemColor: const Color.fromARGB(255, 0, 0, 0),
         showSelectedLabels: false,
         showUnselectedLabels: false,
           items: [
