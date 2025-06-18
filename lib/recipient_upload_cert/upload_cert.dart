@@ -127,7 +127,13 @@ class _UploadScreenState extends State<UploadScreen> {
     }
 
     try {
-      final user = FirebaseAuth.instance.currentUser!;
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        setState(() {
+          status = "❗ User not signed in.";
+        });
+        return;
+      }
       final uuid = Uuid().v4();
       final storageRef = FirebaseStorage.instance.ref(
         'truecopies/${user.uid}/$uuid-$fileName',
