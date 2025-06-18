@@ -16,9 +16,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(MyApp());
 }
 
@@ -37,7 +35,7 @@ class MyApp extends StatelessWidget {
         '/Signup': (context) => SignUpScreen(),
         '/adminDashboard': (context) => PlaceholderScreen('Admin Dashboard'),
         '/caDashboard': (context) => PlaceholderScreen('CA Dashboard'),
-        '/recipientDashboard': (context) => HomeScreen(),
+        '/recipientDashboard': (context) => BottomNavbar(),
         '/clientDashboard': (context) => PlaceholderScreen('Client'),
         '/viewerDashboard': (context) => PlaceholderScreen('Viewer'),
       },
@@ -68,7 +66,9 @@ class AuthWrapper extends StatelessWidget {
           print('⚠️ Document found but no role field.');
         }
       } else {
-        print('🚫 Document does NOT exist. Creating new user with role "recipient".');
+        print(
+          '🚫 Document does NOT exist. Creating new user with role "recipient".',
+        );
       }
 
       // Create default user document if not found or missing role
@@ -124,7 +124,6 @@ class AuthWrapper extends StatelessWidget {
     );
   }
 }
-
 
 class PlaceholderScreen extends StatelessWidget {
   //This is a temporary screen to stand in for your future dashboards (like Admin, CA, etc.).
