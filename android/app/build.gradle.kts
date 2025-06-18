@@ -9,6 +9,8 @@ plugins {
 }
 
 android {
+
+    ndkVersion = "27.0.12077973"
     namespace = "com.example.digital_certificate_project"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"

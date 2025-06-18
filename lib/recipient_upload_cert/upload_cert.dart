@@ -89,6 +89,7 @@ class _UploadScreenState extends State<UploadScreen> {
           selectedFile = File(picked.path);
           fileName = picked.name;
           status = "✅ Image selected. Please enter metadata manually.";
+          metadataExtracted = false; // ✅ ADDED HERE
         });
       }
     } else {
@@ -127,7 +128,13 @@ class _UploadScreenState extends State<UploadScreen> {
     }
 
     try {
-      final user = FirebaseAuth.instance.currentUser!;
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        setState(() {
+          status = "❗ User not signed in.";
+        });
+        return;
+      }
       final uuid = Uuid().v4();
       final storageRef = FirebaseStorage.instance.ref(
         'truecopies/${user.uid}/$uuid-$fileName',
@@ -188,7 +195,7 @@ class _UploadScreenState extends State<UploadScreen> {
               ),
               SizedBox(height: 10),
               Text(fileName != null ? "Selected: $fileName" : status),
-              if (metadataExtracted) ...[
+              if (selectedFile != null) ...[
                 SizedBox(height: 20),
                 TextField(
                   controller: nameController,
