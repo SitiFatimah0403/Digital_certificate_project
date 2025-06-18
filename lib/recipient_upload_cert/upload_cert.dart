@@ -188,7 +188,7 @@ class _UploadScreenState extends State<UploadScreen> {
               ),
               SizedBox(height: 10),
               Text(fileName != null ? "Selected: $fileName" : status),
-              if (metadataExtracted) ...[
+              if (selectedFile != null) ...[
                 SizedBox(height: 20),
                 TextField(
                   controller: nameController,
