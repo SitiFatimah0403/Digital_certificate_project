@@ -90,7 +90,7 @@ class CertCard extends StatelessWidget {
               side: const BorderSide(color: Colors.black26),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             ),
-            child: const Text("More"),
+            child: const Text("View"),
           ),
         ],
       ),
