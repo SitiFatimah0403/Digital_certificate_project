@@ -13,7 +13,7 @@ class _CAVerificationState extends State<CA_Verification> {
   String selectedStatus = 'All';
 
   // Toggle between dummy data and real Firestore
-  final bool useDummyData = false;
+  final bool useDummyData = true;
 
   // Sample certificates for testing without database connection
   final List<Map<String, dynamic>> dummyDocuments = [
@@ -191,38 +191,39 @@ class _CAVerificationState extends State<CA_Verification> {
             Text(metadata['date_issued']?.split('T')?.first ?? ''),
           ],
         ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (_) => ReviewPage(
-                          docId: docId,
-                          metadata: metadata,
-                          status: status,
-                        ),
-                  ),
-                );
-              },
-              child: Text('REVIEW >', style: TextStyle(color: Colors.blue)),
+        trailing: Row(
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    TextButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ReviewPage(
+              docId: docId,
+              metadata: metadata,
+              status: status,
             ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: getStatusColor(status),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                status.capitalize(),
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
+          ),
+        );
+      },
+      child: Text('REVIEW', style: TextStyle(color: Colors.blue)),
+    ),
+    SizedBox(width: 8),
+    Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: getStatusColor(status),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        status.capitalize(),
+        style: TextStyle(color: Colors.white),
+      ),
+    ),
+  ],
+),
+
       ),
     );
   }
