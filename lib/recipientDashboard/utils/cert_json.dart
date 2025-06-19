@@ -15,4 +15,8 @@ List<Map<String, dynamic>> certList = [
     'certName': 'Python Beginner',
     'receivedDate': 'March 2, 2024',
   },
+   {
+    'certName': 'Mobile Development for Beginner',
+    'receivedDate': 'May 2, 2024',
+  },
 ];
