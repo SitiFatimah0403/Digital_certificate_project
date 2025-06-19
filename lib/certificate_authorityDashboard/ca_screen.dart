@@ -7,9 +7,9 @@ void main() {
 }
 
 class CertificateApp extends StatelessWidget {
-   CertificateApp({super.key});
+  CertificateApp({super.key});
 
-   final AuthService _authService = AuthService(); // ni for sign out nanti - Fatimah
+  final AuthService _authService = AuthService(); // for logout
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,6 @@ class CertificateApp extends StatelessWidget {
           background: Colors.black,
           brightness: Brightness.dark,
         ),
-        
         useMaterial3: true,
         cardTheme: CardTheme(
           elevation: 4,
@@ -43,10 +42,9 @@ class CertificateApp extends StatelessWidget {
           elevation: 0,
           backgroundColor: Colors.grey[900],
           foregroundColor: Colors.white,
-          
         ),
       ),
-      home: HomePage(),
+      home: HomePage(authService: _authService),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -61,7 +59,8 @@ class Client {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final AuthService authService;
+  const HomePage({super.key, required this.authService});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -75,8 +74,7 @@ class _HomePageState extends State<HomePage> {
 
     String? newName = await showDialog<String>(
       context: context,
-      builder:
-          (_) => AlertDialog(
+      builder: (_) => AlertDialog(
         title: Text('Add Client'),
         content: TextField(
           controller: controller,
@@ -110,8 +108,7 @@ class _HomePageState extends State<HomePage> {
 
     final result = await showDialog<Map<String, String>>(
       context: context,
-      builder:
-          (_) => AlertDialog(
+      builder: (_) => AlertDialog(
         title: Text('Edit Client'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -136,8 +133,7 @@ class _HomePageState extends State<HomePage> {
             child: Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed:
-                () => Navigator.pop(context, {
+            onPressed: () => Navigator.pop(context, {
               'name': nameController.text,
               'event': eventController.text,
               'date': dateController.text,
@@ -178,7 +174,24 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Certificate Authority"), centerTitle: true),
+      appBar: AppBar(
+        title: Text("Certificate Authority"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout, color: Colors.white),
+            tooltip: 'Logout',
+            onPressed: () async {
+              await widget.authService.signOut();
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/login',
+                (route) => false,
+              );
+            },
+          ),
+        ],
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -263,10 +276,8 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-/// Generate Cert - View Data + Upload Image
 class GenerateCertPage extends StatelessWidget {
   final List<Client> clients;
-
   const GenerateCertPage({super.key, required this.clients});
 
   void _uploadFile(BuildContext context, String clientName) async {
@@ -277,8 +288,7 @@ class GenerateCertPage extends StatelessWidget {
 
     if (result != null) {
       final file = result.files.first;
-      String fileType =
-      file.extension?.toLowerCase() == 'pdf' ? 'PDF' : 'Image';
+      String fileType = file.extension?.toLowerCase() == 'pdf' ? 'PDF' : 'Image';
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -306,10 +316,7 @@ class GenerateCertPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Confirm Certificate Info'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text('Confirm Certificate Info'), centerTitle: true),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -330,55 +337,24 @@ class GenerateCertPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(client.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8),
+                    Text("Event: ${client.event}"),
+                    Text("Issuance Date: ${client.issuanceDate}"),
+                    SizedBox(height: 8),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                client.name,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                "Event: ${client.event}",
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              Text(
-                                "Issuance Date: ${client.issuanceDate}",
-                                style: TextStyle(fontSize: 14),
-                              ),
-                            ],
-                          ),
+                        ElevatedButton.icon(
+                          icon: Icon(Icons.upload_file),
+                          label: Text("Upload PDF"),
+                          onPressed: () => _uploadFile(context, client.name),
                         ),
-                        Column(
-                          children: [
-                            ElevatedButton.icon(
-                              icon: Icon(Icons.upload_file),
-                              label: Text("Upload PDF"),
-                              onPressed:
-                                  () => _uploadFile(context, client.name),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.indigo,
-                                foregroundColor: Colors.white,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            ElevatedButton.icon(
-                              icon: Icon(Icons.image),
-                              label: Text("Upload Photo"),
-                              onPressed:
-                                  () => _uploadFile(context, client.name),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.indigoAccent,
-                                foregroundColor: Colors.white,
-                              ),
-                            ),
-                          ],
+                        SizedBox(width: 8),
+                        ElevatedButton.icon(
+                          icon: Icon(Icons.image),
+                          label: Text("Upload Photo"),
+                          onPressed: () => _uploadFile(context, client.name),
                         ),
                       ],
                     ),
@@ -393,10 +369,8 @@ class GenerateCertPage extends StatelessWidget {
   }
 }
 
-/// View All Clients
 class ViewAllPage extends StatelessWidget {
   final List<Client> clients;
-
   const ViewAllPage({super.key, required this.clients});
 
   @override
@@ -419,16 +393,10 @@ class ViewAllPage extends StatelessWidget {
             return Card(
               child: ListTile(
                 contentPadding: EdgeInsets.all(16),
-                title: Text(
-                  client.name,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
+                title: Text(client.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 subtitle: Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: Text(
-                    'Event: ${client.event} | Date: ${client.issuanceDate}',
-                    style: TextStyle(fontSize: 14),
-                  ),
+                  child: Text('Event: ${client.event} | Date: ${client.issuanceDate}'),
                 ),
               ),
             );
@@ -439,7 +407,6 @@ class ViewAllPage extends StatelessWidget {
   }
 }
 
-/// LTC Page
 class LtcPage extends StatelessWidget {
   const LtcPage({super.key});
 
