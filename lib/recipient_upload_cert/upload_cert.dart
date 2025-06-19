@@ -70,6 +70,9 @@ class _UploadScreenState extends State<UploadScreen> {
       lastDate: DateTime(2100),
     );
 
+    print("🗓️ Date selected: $selected");
+
+    if (!mounted) return;
     if (selected != null) {
       setState(() {
         if (isIssueDate) {
@@ -115,6 +118,10 @@ class _UploadScreenState extends State<UploadScreen> {
   }
 
   Future<void> uploadAndSave() async {
+    print("🚀 Starting upload process...");
+    print("📂 File: $fileName");
+    print("🧑 User: ${FirebaseAuth.instance.currentUser?.uid}");
+
     if (selectedFile == null ||
         nameController.text.isEmpty ||
         orgController.text.isEmpty ||
@@ -135,11 +142,13 @@ class _UploadScreenState extends State<UploadScreen> {
         });
         return;
       }
+
       final uuid = Uuid().v4();
       final storageRef = FirebaseStorage.instance.ref(
         'truecopies/${user.uid}/$uuid-$fileName',
       );
-      await storageRef.putFile(selectedFile!);
+
+      await storageRef.putFile(selectedFile!, SettableMetadata());
       final downloadUrl = await storageRef.getDownloadURL();
 
       final docRef = FirebaseFirestore.instance.collection('truecopies').doc();
@@ -163,6 +172,8 @@ class _UploadScreenState extends State<UploadScreen> {
         status = "✅ File uploaded and metadata saved successfully!";
       });
     } catch (e) {
+      print("❌ Upload failed: $e");
+
       setState(() {
         status = "❌ Upload failed: $e";
       });

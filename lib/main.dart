@@ -16,6 +16,7 @@ import 'core/constants.dart';
 import 'auth/services/auth_service.dart';
 import 'auth/utils/role_checker.dart'; // Optional: for role-based redirection
 import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:digital_certificate_project/recipient_upload_cert/upload_cert.dart'; //temporary
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.grey),
       home: AuthWrapper(), // controls where to go after startup
+      //home: UploadScreen(), // temporary to test UploadScreen
       routes: {
         '/login': (context) => LoginScreen(),
         '/Signup': (context) => SignUpScreen(),
