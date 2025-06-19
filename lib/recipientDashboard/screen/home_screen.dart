@@ -38,7 +38,7 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.only(top: 40, bottom: 20),
+        padding: const EdgeInsets.only(top: 18, bottom: 20),
         children: const [
            Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
@@ -55,7 +55,6 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           ),
-           SizedBox(height: 15),
            CertView(),
         ],
       ),
