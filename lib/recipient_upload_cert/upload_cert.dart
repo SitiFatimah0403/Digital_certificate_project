@@ -142,7 +142,8 @@ class _UploadScreenState extends State<UploadScreen> {
       await storageRef.putFile(selectedFile!);
       final downloadUrl = await storageRef.getDownloadURL();
 
-      await FirebaseFirestore.instance.collection('truecopies').add({
+      final docRef = FirebaseFirestore.instance.collection('truecopies').doc();
+      await docRef.set({
         'user_id': user.uid,
         'file_url': downloadUrl,
         'file_name': fileName,
