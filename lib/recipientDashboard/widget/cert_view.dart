@@ -7,25 +7,26 @@ class CertView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column( //  relying on parent ListView to handle scrolling
-      children: certList.map((cert) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: CertCard(
-            certName: cert['certName'],
-            receivedDate: cert['receivedDate'],
-            onMorePressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CertDetailPage(cert: cert),
-                ),
-              );
-            },
-            certImage: null,
-          ),
-        );
-      }).toList(),
+    return Column( // relying on parent ListView to handle scrolling
+      children:
+          certList.map((cert) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: CertCard(
+                certName: cert['certName'],
+                receivedDate: cert['receivedDate'],
+                onMorePressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CertDetailPage(cert: cert),
+                    ),
+                  );
+                },
+                certImage: null,
+              ),
+            );
+          }).toList(),
     );
   }
 }
@@ -49,8 +50,15 @@ class CertCard extends StatelessWidget {
     return Container(
       height: 120,
       decoration: BoxDecoration(
-        color: const Color(0xFFECEAEA),
+        color: const Color(0xCDFFFFFF),
         borderRadius: BorderRadius.circular(21),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1), // Shadow color with opacity
+            blurRadius: 10, // Soften the shadow
+            offset: Offset(0, 4), // Move shadow downwards
+          ),
+        ],
       ),
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -59,9 +67,10 @@ class CertCard extends StatelessWidget {
             radius: 30,
             backgroundColor: Colors.grey[300],
             backgroundImage: certImage,
-            child: certImage == null
-                ? const Icon(Icons.person, size: 30, color: Colors.black54)
-                : null,
+            child:
+                certImage == null
+                    ? const Icon(Icons.person, size: 30, color: Colors.black54)
+                    : null,
           ),
           const SizedBox(width: 16),
           Expanded(

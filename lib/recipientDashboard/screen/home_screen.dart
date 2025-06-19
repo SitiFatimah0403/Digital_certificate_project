@@ -46,7 +46,7 @@ class HomeScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Your Cert",
+                  "Your Cert(s)",
                   style: TextStyle(
                     fontSize: 21,
                     fontWeight: FontWeight.bold,
