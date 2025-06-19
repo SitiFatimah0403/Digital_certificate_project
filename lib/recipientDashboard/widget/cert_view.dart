@@ -7,9 +7,8 @@ class CertView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: List.generate(certList.length, (index) {
-        final cert = certList[index];
+    return Column( //  relying on parent ListView to handle scrolling
+      children: certList.map((cert) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: CertCard(
@@ -24,14 +23,12 @@ class CertView extends StatelessWidget {
               );
             },
             certImage: null,
-            //certImage: const NetworkImage('https://via.placeholder.com/100'),
           ),
         );
-      }),
+      }).toList(),
     );
   }
 }
-
 
 class CertCard extends StatelessWidget {
   final String certName;
