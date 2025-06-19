@@ -1,3 +1,4 @@
+import 'package:digital_certificate_project/auth/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -6,7 +7,9 @@ void main() {
 }
 
 class CertificateApp extends StatelessWidget {
-  const CertificateApp({super.key});
+   CertificateApp({super.key});
+
+   final AuthService _authService = AuthService(); // ni for sign out nanti - Fatimah
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +23,7 @@ class CertificateApp extends StatelessWidget {
           background: Colors.black,
           brightness: Brightness.dark,
         ),
+        
         useMaterial3: true,
         cardTheme: CardTheme(
           elevation: 4,
@@ -39,6 +43,7 @@ class CertificateApp extends StatelessWidget {
           elevation: 0,
           backgroundColor: Colors.grey[900],
           foregroundColor: Colors.white,
+          
         ),
       ),
       home: HomePage(),

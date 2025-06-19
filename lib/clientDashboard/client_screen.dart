@@ -1,16 +1,40 @@
+import 'package:digital_certificate_project/auth/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'client_detail.dart';
 
 class ClientScreen extends StatelessWidget {
-  const ClientScreen({super.key});
+   ClientScreen({super.key});
+
+   final AuthService _authService = AuthService(); // for sign out - Fatimah
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xB5ABAABB),
-        title: const Text("CLIENT"),
+        backgroundColor: const Color.fromARGB(181, 0, 0, 0),
+        title: const Text(
+        "CLIENT",
+        style: TextStyle(
+        color: Colors.white,
+        fontFamily: 'RobotoMono',
+        fontSize: 20,
+         fontWeight: FontWeight.bold,
+    ),
+  ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout, color: Colors.white,),
+            onPressed: () async {
+              await _authService.signOut(); // call method from AuthService
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/login',
+                (route) => false, 
+              );
+            },
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),

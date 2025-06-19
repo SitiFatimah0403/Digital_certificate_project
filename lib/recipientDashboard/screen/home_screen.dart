@@ -5,7 +5,7 @@ import 'package:digital_certificate_project/auth/services/auth_service.dart';
 class HomeScreen extends StatelessWidget {
    HomeScreen({super.key});
 
-  // ✅ Create an instance of AuthService
+  // Create an instance of AuthService
   final AuthService _authService = AuthService();
 
   @override
@@ -27,7 +27,7 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.logout, color: Colors.white,),
             onPressed: () async {
-              await _authService.signOut(); // ✅ call method from AuthService
+              await _authService.signOut(); // call method from AuthService
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 '/login',
