@@ -120,7 +120,7 @@ class _UploadScreenState extends State<UploadScreen> {
   Future<void> uploadAndSave() async {
     print("🚀 Starting upload process...");
     print("📂 File: $fileName");
-    print("🧑 User: ${FirebaseAuth.instance.currentUser?.uid}");
+    print("👤 Current user: ${FirebaseAuth.instance.currentUser}");
 
     if (selectedFile == null ||
         nameController.text.isEmpty ||
@@ -135,6 +135,11 @@ class _UploadScreenState extends State<UploadScreen> {
     }
 
     try {
+      /* ni untuk testing*/
+      //final userId = FirebaseAuth.instance.currentUser?.uid ?? 'test_user';
+      //print("🧪 Using userId: $userId");
+
+      //ni untuk dynamic user
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         setState(() {
@@ -144,6 +149,7 @@ class _UploadScreenState extends State<UploadScreen> {
       }
 
       final uuid = Uuid().v4();
+      
 
       /* try untuk tengok extract ke tak ke firestore
       final storageRef = FirebaseStorage.instance.ref(
@@ -172,6 +178,7 @@ class _UploadScreenState extends State<UploadScreen> {
           'expiry_date': expiryDate!.toIso8601String(),
         },
       });
+
 
       setState(() {
         status = "✅ File uploaded and metadata saved successfully!";
@@ -202,10 +209,10 @@ class _UploadScreenState extends State<UploadScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: 20),
-              ElevatedButton(
+              /*ElevatedButton(
                 onPressed: () => pickFile(isImage: true),
                 child: Text("Upload Image"),
-              ),
+              ),*/
               ElevatedButton(
                 onPressed: () => pickFile(isImage: false),
                 child: Text("Upload PDF"),
