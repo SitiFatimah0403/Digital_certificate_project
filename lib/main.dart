@@ -23,9 +23,9 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   print(Firebase.apps); // ✅ Confirm Firebase is initialized
   // For testing only
-  if (FirebaseAuth.instance.currentUser == null) {
+  /*if (FirebaseAuth.instance.currentUser == null) {
     await FirebaseAuth.instance.signInAnonymously();
-  }
+  }*/
   runApp(MyApp());
 }
 
