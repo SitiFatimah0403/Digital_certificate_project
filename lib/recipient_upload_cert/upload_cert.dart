@@ -212,6 +212,10 @@ class _UploadScreenState extends State<UploadScreen> {
               ),*/
               ElevatedButton(
                 onPressed: () => pickFile(isImage: false),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black, // 🔲 Black background
+                  foregroundColor: Colors.white, // ⚪ Optional: white text
+                ),
                 child: Text("Upload PDF"),
               ),
               SizedBox(height: 10),
@@ -240,6 +244,10 @@ class _UploadScreenState extends State<UploadScreen> {
                     ElevatedButton(
                       onPressed: () => pickDate(context, true),
                       child: Text("Select Issue Date"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black, // 🔲 Black background
+                        foregroundColor: Colors.white, // ⚪ Optional: white text
+                      ),
                     ),
                   ],
                 ),
@@ -252,6 +260,10 @@ class _UploadScreenState extends State<UploadScreen> {
                     ElevatedButton(
                       onPressed: () => pickDate(context, false),
                       child: Text("Select Expiry Date"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black, // 🔲 Black background
+                        foregroundColor: Colors.white, // ⚪ Optional: white text
+                      ),
                     ),
                   ],
                 ),
@@ -259,6 +271,10 @@ class _UploadScreenState extends State<UploadScreen> {
                 ElevatedButton(
                   onPressed: uploadAndSave,
                   child: Text("Submit & Upload"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black, // 🔲 Black background
+                    foregroundColor: Colors.white, // ⚪ Optional: white text
+                  ),
                 ),
               ],
               SizedBox(height: 10),
