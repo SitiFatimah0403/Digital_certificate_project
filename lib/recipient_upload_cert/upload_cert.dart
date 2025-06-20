@@ -149,7 +149,6 @@ class _UploadScreenState extends State<UploadScreen> {
       }
 
       final uuid = Uuid().v4();
-      
 
       // try untuk tengok extract ke tak ke firestore
       final storageRef = FirebaseStorage.instance.ref(
@@ -158,7 +157,6 @@ class _UploadScreenState extends State<UploadScreen> {
 
       await storageRef.putFile(selectedFile!, SettableMetadata());
       final downloadUrl = await storageRef.getDownloadURL();
-      
 
       //final downloadUrl = "https://example.com/dummy.pdf";
 
@@ -178,7 +176,6 @@ class _UploadScreenState extends State<UploadScreen> {
           'expiry_date': expiryDate!.toIso8601String(),
         },
       });
-
 
       setState(() {
         status = "✅ File uploaded and metadata saved successfully!";
