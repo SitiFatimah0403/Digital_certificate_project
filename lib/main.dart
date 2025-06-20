@@ -16,12 +16,16 @@ import 'core/constants.dart';
 import 'auth/services/auth_service.dart';
 import 'auth/utils/role_checker.dart'; // Optional: for role-based redirection
 import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'package:digital_certificate_project/recipient_upload_cert/upload_cert.dart'; //temporary
+import 'package:digital_certificate_project/recipient_upload_cert/upload_cert.dart'; //temporary
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   print(Firebase.apps); // ✅ Confirm Firebase is initialized
+  // For testing only
+  if (FirebaseAuth.instance.currentUser == null) {
+    await FirebaseAuth.instance.signInAnonymously();
+  }
   runApp(MyApp());
 }
 

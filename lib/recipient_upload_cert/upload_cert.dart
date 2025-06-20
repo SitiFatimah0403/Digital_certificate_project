@@ -151,16 +151,16 @@ class _UploadScreenState extends State<UploadScreen> {
       final uuid = Uuid().v4();
       
 
-      /* try untuk tengok extract ke tak ke firestore
+      // try untuk tengok extract ke tak ke firestore
       final storageRef = FirebaseStorage.instance.ref(
         'truecopies/${user.uid}/$uuid-$fileName',
       );
 
       await storageRef.putFile(selectedFile!, SettableMetadata());
       final downloadUrl = await storageRef.getDownloadURL();
-      */
+      
 
-      final downloadUrl = "https://example.com/dummy.pdf";
+      //final downloadUrl = "https://example.com/dummy.pdf";
 
       final docRef = FirebaseFirestore.instance.collection('truecopies').doc();
       await docRef.set({
