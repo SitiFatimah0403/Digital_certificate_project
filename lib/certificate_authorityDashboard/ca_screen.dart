@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 
 void main() async {
@@ -25,7 +26,7 @@ class CertificateApp extends StatelessWidget {
           primary: Colors.indigo,
           secondary: Colors.indigoAccent,
           surface: Colors.grey[900]!,
-          background: Colors.black,
+          background: Colors.white,
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
@@ -56,13 +57,13 @@ class CertificateApp extends StatelessWidget {
 }
 
 class Client {
+  String id; // Firestore document ID
   String name;
   String event;
   String issuanceDate;
 
-  Client(this.name, {this.event = '', this.issuanceDate = ''});
+  Client(this.name, {this.id = '', this.event = '', this.issuanceDate = ''});
 
-  // 🔽 This is required to send data to Firestore
   Map<String, dynamic> toMap() {
     return {
       'name': name,
@@ -70,7 +71,18 @@ class Client {
       'issuanceDate': issuanceDate,
     };
   }
+
+  factory Client.fromDoc(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Client(
+      data['name'] ?? '',
+      id: doc.id,
+      event: data['event'] ?? '',
+      issuanceDate: data['issuanceDate'] ?? '',
+    );
+  }
 }
+
 
 class HomePage extends StatefulWidget {
   final AuthService authService;
@@ -81,31 +93,47 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Client> clients = [Client('Client A'), Client('Client B')];
+  List<Client> clients = [Client('Ali Abu Yazid'), Client('Yu Ji-min')];
 
   void _addClient() async {
-    final TextEditingController controller = TextEditingController();
+    final nameController = TextEditingController();
+    final eventController = TextEditingController();
+    final dateController = TextEditingController();
 
-    // 1. Wait for user to input name and close dialog
-    final String? enteredName = await showDialog<String>(
+    final result = await showDialog<Map<String, String>>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           title: Text('Add Client'),
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(hintText: 'Enter client name'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                controller: eventController,
+                decoration: InputDecoration(labelText: 'Event'),
+              ),
+              TextField(
+                controller: dateController,
+                decoration: InputDecoration(labelText: 'Issuance Date'),
+              ),
+            ],
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext); // Return null (cancel)
-              },
+              onPressed: () => Navigator.pop(dialogContext),
               child: Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(dialogContext, controller.text); // Return name
+                Navigator.pop(dialogContext, {
+                  'name': nameController.text,
+                  'event': eventController.text,
+                  'date': dateController.text,
+                });
               },
               child: Text('Add'),
             ),
@@ -114,32 +142,38 @@ class _HomePageState extends State<HomePage> {
       },
     );
 
-    // 2. After dialog closed, do everything safely
-    if (enteredName != null && enteredName.trim().isNotEmpty) {
-      if (!mounted) return; // ✅ Double-safety before doing anything with context
+    if (!mounted || result == null || result['name']!.trim().isEmpty) return;
 
-      final newClient = Client(enteredName.trim());
+    final newClient = Client(
+      result['name']!.trim(),
+      event: result['event'] ?? '',
+      issuanceDate: result['date'] ?? '',
+    );
+
+    try {
+      final docRef = await FirebaseFirestore.instance
+          .collection('clients')
+          .add(newClient.toMap());
+
       setState(() {
-        clients.add(newClient);
+        clients.add(Client(
+          newClient.name,
+          event: newClient.event,
+          issuanceDate: newClient.issuanceDate,
+        ));
       });
 
-      try {
-        await FirebaseFirestore.instance
-            .collection('clients')
-            .add(newClient.toMap());
-
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Client added to Firestore')),
-        );
-      } catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error adding client to Firestore')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Client added to Firestore')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error adding client: $e')),
+      );
     }
   }
+
+
 
 
 
@@ -211,14 +245,42 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    if (result != null) {
-      setState(() {
-        clients[index].name = result['name'] ?? client.name;
-        clients[index].event = result['event'] ?? client.event;
-        clients[index].issuanceDate = result['date'] ?? client.issuanceDate;
-      });
+    // 🛑 Avoid using context if widget is gone
+    if (!mounted || result == null) return;
+
+    setState(() {
+      client.name = result['name'] ?? client.name;
+      client.event = result['event'] ?? client.event;
+      client.issuanceDate = result['date'] ?? client.issuanceDate;
+    });
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('clients')
+          .where('name', isEqualTo: client.name)
+          .get();
+
+      for (var doc in snapshot.docs) {
+        await doc.reference.update(client.toMap());
+      }
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Client updated in Firestore')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error updating client: $e')),
+      );
     }
   }
+
+
+
+
 
   void _goToGenerateCertPage() {
     Navigator.push(
@@ -347,38 +409,41 @@ class GenerateCertPage extends StatelessWidget {
   final List<Client> clients;
   const GenerateCertPage({super.key, required this.clients});
 
-  void _uploadFile(BuildContext context, String clientName) async {
+  void _uploadFile(BuildContext context, Client client) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+      withData: true,
     );
 
-    if (result != null) {
+    if (result != null && result.files.single.bytes != null) {
       final file = result.files.first;
-      String fileType = file.extension?.toLowerCase() == 'pdf' ? 'PDF' : 'Image';
+      final fileName = '${client.name}_${DateTime.now().millisecondsSinceEpoch}.${file.extension}';
+      final storageRef = FirebaseStorage.instance.ref().child('certificates/$fileName');
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(
-                file.extension?.toLowerCase() == 'pdf'
-                    ? Icons.picture_as_pdf
-                    : Icons.image,
-                color: Colors.white,
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text('Uploaded $fileType for $clientName: ${file.name}'),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
-        ),
-      );
+      try {
+        await storageRef.putData(file.bytes!);
+        final downloadUrl = await storageRef.getDownloadURL();
+
+        await FirebaseFirestore.instance.collection('clients').add({
+          'name': client.name,
+          'event': client.event,
+          'issuanceDate': client.issuanceDate,
+          'fileUrl': downloadUrl,
+          'fileType': file.extension,
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Uploaded & saved for ${client.name}')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Upload failed: $e')),
+        );
+      }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -414,15 +479,10 @@ class GenerateCertPage extends StatelessWidget {
                       children: [
                         ElevatedButton.icon(
                           icon: Icon(Icons.upload_file),
-                          label: Text("Upload PDF"),
-                          onPressed: () => _uploadFile(context, client.name),
+                          label: Text("Upload File"),
+                          onPressed: () => _uploadFile(context, client),
                         ),
-                        SizedBox(width: 8),
-                        ElevatedButton.icon(
-                          icon: Icon(Icons.image),
-                          label: Text("Upload Photo"),
-                          onPressed: () => _uploadFile(context, client.name),
-                        ),
+
                       ],
                     ),
                   ],
