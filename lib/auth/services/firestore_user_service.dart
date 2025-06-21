@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
 
-class FirestoreService {
+class FirestoreUserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Save a new user using UID as document ID (e.g. from FirebaseAuth)

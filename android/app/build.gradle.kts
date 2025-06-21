@@ -6,6 +6,7 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    
 }
 
 android {
@@ -59,4 +60,5 @@ dependencies {
     // Add other Firebase dependencies here if needed
 
     /*The Firebase Android BoM (Bill of Materials) enables you to manage all your Firebase library versions by specifying only one version — the BoM's version. */
+    
 }

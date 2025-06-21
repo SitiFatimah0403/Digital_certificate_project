@@ -12,7 +12,12 @@
           "package_name": "com.example.digital_certificate_project"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "243564777686-v1dvg3m1ljv6d6dm531oa9o5j2pbuhbc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCErfAUsgzmMmxRrSg4zqbsgvEiu7X3Tf8"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "243564777686-v1dvg3m1ljv6d6dm531oa9o5j2pbuhbc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "243564777686-l3d40c83fiuqmgh5ouf3a2ua5ntslcjv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.digitalCertificateProject"
+              }
+            }
+          ]
         }
       }
     }

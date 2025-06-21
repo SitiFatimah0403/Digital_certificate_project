@@ -1,6 +1,6 @@
 import 'package:digital_certificate_project/Components/round_logo.dart';
 import 'package:digital_certificate_project/auth/models/user_model.dart';
-import 'package:digital_certificate_project/auth/services/firestore_service.dart';
+import 'package:digital_certificate_project/auth/services/firestore_user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -14,12 +14,12 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final FirestoreService firestoreService = FirestoreService();
+  final FirestoreUserService firestoreService = FirestoreUserService();
   bool passwordVisible = false;
 
   Future<void> signUpUser(String email, String password) async {
     try {
-      if (!email.endsWith('@student.upm.edu.my')) {
+      if (!email.endsWith('@student.upm.edu.my' )) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Only @student.upm.edu.my emails are allowed')),
         );
@@ -38,6 +38,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           password: password,
           role: 'recipient',
         );
+
 
         await firestoreService.saveUser(newUser);
 

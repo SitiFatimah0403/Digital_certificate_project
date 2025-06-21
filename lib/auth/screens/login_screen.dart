@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'signin_screen.dart';
 import '../../Components/round_logo.dart';
 import '../services/auth_service.dart';
-import '../services/firestore_service.dart'; 
+import '../services/firestore_user_service.dart'; 
 import 'package:firebase_auth/firebase_auth.dart';
 
 
@@ -19,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController passwordController = TextEditingController();
   bool passwordVisible = false;
 
-  final FirestoreService firestoreService = FirestoreService();
+  final FirestoreUserService firestoreService = FirestoreUserService();
 
   // Google Sign-In logic
 void _handleGoogleSignIn() async {
@@ -35,7 +35,7 @@ void _handleGoogleSignIn() async {
 
       if (existingUser == null) {
         // If not, save new user with default role
-        await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        await FirebaseFirestore.instance.collection('users').doc(email).set({
           'uid': uid,
           'email': email,
           'role': 'recipient', // You can change this default role as needed
@@ -44,7 +44,7 @@ void _handleGoogleSignIn() async {
       }
 
       // Get the role from Firestore
-      final role = await firestoreService.getUserRole(email);
+      final role = await firestoreService.getUserRole(uid);
 
       if (role != null) {
         ScaffoldMessenger.of(context).showSnackBar(

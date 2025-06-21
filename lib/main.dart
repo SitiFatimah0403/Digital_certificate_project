@@ -21,11 +21,14 @@ import 'package:digital_certificate_project/recipient_upload_cert/upload_cert.da
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  print(Firebase.apps); // ✅ Confirm Firebase is initialized
+  print(Firebase.apps); 
+  print('🔥 Firebase initialized');// ✅ Confirm Firebase is initialized
   // For testing only
   /*if (FirebaseAuth.instance.currentUser == null) {
     await FirebaseAuth.instance.signInAnonymously();
   }*/
+
+
   runApp(MyApp());
 }
 
@@ -63,7 +66,7 @@ class AuthWrapper extends StatelessWidget {
       final email = user.email;
       print('1)📧 Checking role for user: $email');
 
-      final docRef = FirebaseFirestore.instance.collection('users').doc(email);
+      final docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
       final doc = await docRef.get();
 
       if (doc.exists) {
