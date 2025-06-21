@@ -22,38 +22,71 @@ class CertificateApp extends StatelessWidget {
     return MaterialApp(
       title: 'Certificate Authority',
       theme: ThemeData(
-        colorScheme: ColorScheme.dark(
+        colorScheme: ColorScheme.light(
           primary: Colors.indigo,
           secondary: Colors.indigoAccent,
-          surface: Colors.grey[900]!,
-          background: Colors.white,
-          brightness: Brightness.dark,
+          surface: Colors.white,
+          background: Colors.grey[100]!,
+          onPrimary: Colors.white,
+          onSecondary: Colors.black,
+          onSurface: Colors.black,
+          onBackground: Colors.white54,
         ),
+        scaffoldBackgroundColor: Colors.grey[100],
         useMaterial3: true,
-        cardTheme: CardThemeData(
+        cardTheme: CardTheme(
+          color: Colors.white,
           elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
+          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.indigo,
             padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
+            textStyle: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.indigo),
           ),
         ),
         appBarTheme: AppBarTheme(
-          elevation: 0,
-          backgroundColor: Colors.grey[900],
-          foregroundColor: Colors.white,
+          elevation: 1,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black87,
+          titleTextStyle: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+          iconTheme: IconThemeData(color: Colors.black87),
         ),
       ),
       home: HomePage(authService: _authService),
       debugShowCheckedModeBanner: false,
     );
   }
+
 }
 
 class Client {
@@ -90,10 +123,16 @@ class HomePage extends StatefulWidget {
 
   @override
   State<HomePage> createState() => _HomePageState();
+
+
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Client> clients = [Client('Ali Abu Yazid'), Client('Yu Ji-min')];
+  List<Client> clients = [
+    Client('Ali Abu Yazid', event: 'Coding Bootcamp', issuanceDate: '2025-06-21'),
+    Client('Yu Ji-min', event: 'Artificial Intelligence Course', issuanceDate: '2025-03-23')
+  ];
+
 
   void _addClient() async {
     final nameController = TextEditingController();
@@ -326,7 +365,7 @@ class _HomePageState extends State<HomePage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.grey[900]!, Colors.black],
+            colors: [Colors.white54, Colors.white],
           ),
         ),
         child: Padding(
@@ -334,36 +373,86 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ElevatedButton.icon(
-                    onPressed: _goToGenerateCertPage,
-                    icon: Icon(Icons.card_membership),
-                    label: Text('Generate Cert'),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _goToGenerateCertPage,
+                      style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(vertical: 16)),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.card_membership, size: 20),
+                          SizedBox(height: 6),
+                          Text(
+                            'Generate Cert',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  ElevatedButton.icon(
-                    onPressed: _goToLtcPage,
-                    icon: Icon(Icons.verified_user),
-                    label: Text('CTC'),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _goToLtcPage,
+                      style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(vertical: 16)),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.verified_user, size: 20),
+                          SizedBox(height: 6),
+                          Text(
+                            'CTC',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _addClient,
+                      style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(vertical: 16)),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.add, size: 20),
+                          SizedBox(height: 6),
+                          Text(
+                            'Add Name',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _viewAll,
+                      style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(vertical: 16)),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.list, size: 20),
+                          SizedBox(height: 6),
+                          Text(
+                            'View All',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
-              SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: _addClient,
-                    icon: Icon(Icons.add),
-                    label: Text('Add Name'),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: _viewAll,
-                    icon: Icon(Icons.list),
-                    label: Text('View All'),
-                  ),
-                ],
-              ),
+
+
               SizedBox(height: 16),
               Expanded(
                 child: ListView.builder(
