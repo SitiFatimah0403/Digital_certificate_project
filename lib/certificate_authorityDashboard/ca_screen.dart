@@ -1,8 +1,13 @@
 import 'package:digital_certificate_project/auth/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() {
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Required before Firebase use
   runApp(CertificateApp());
 }
 
@@ -56,6 +61,15 @@ class Client {
   String issuanceDate;
 
   Client(this.name, {this.event = '', this.issuanceDate = ''});
+
+  // 🔽 This is required to send data to Firestore
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'event': event,
+      'issuanceDate': issuanceDate,
+    };
+  }
 }
 
 class HomePage extends StatefulWidget {
@@ -70,35 +84,88 @@ class _HomePageState extends State<HomePage> {
   List<Client> clients = [Client('Client A'), Client('Client B')];
 
   void _addClient() async {
-    TextEditingController controller = TextEditingController();
+    final TextEditingController controller = TextEditingController();
 
-    String? newName = await showDialog<String>(
+    // 1. Wait for user to input name and close dialog
+    final String? enteredName = await showDialog<String>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text('Add Client'),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(hintText: 'Enter client name'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text('Add Client'),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(hintText: 'Enter client name'),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: Text('Add'),
-          ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext); // Return null (cancel)
+              },
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, controller.text); // Return name
+              },
+              child: Text('Add'),
+            ),
+          ],
+        );
+      },
     );
 
-    if (newName != null && newName.trim().isNotEmpty) {
+    // 2. After dialog closed, do everything safely
+    if (enteredName != null && enteredName.trim().isNotEmpty) {
+      if (!mounted) return; // ✅ Double-safety before doing anything with context
+
+      final newClient = Client(enteredName.trim());
       setState(() {
-        clients.add(Client(newName.trim()));
+        clients.add(newClient);
       });
+
+      try {
+        await FirebaseFirestore.instance
+            .collection('clients')
+            .add(newClient.toMap());
+
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Client added to Firestore')),
+        );
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error adding client to Firestore')),
+        );
+      }
     }
   }
+
+
+
+  void _saveNewClient(String name) async {
+    final newClient = Client(name);
+
+    setState(() {
+      clients.add(newClient);
+    });
+
+    try {
+      await FirebaseFirestore.instance.collection('clients').add(newClient.toMap());
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Client added to Firestore')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error adding client to Firestore')),
+      );
+    }
+  }
+
+
 
   void _editClient(int index) async {
     final client = clients[index];
