@@ -7,6 +7,7 @@ import 'package:digital_certificate_project/recipient_verify_cert/CA_verificatio
 import 'package:digital_certificate_project/recipientDashboard/base/bottom_navbar.dart';
 import 'package:digital_certificate_project/recipientDashboard/screen/home_screen.dart';
 import 'package:digital_certificate_project/recipient_verify_cert/CA_verification.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,10 +18,29 @@ import 'auth/services/auth_service.dart';
 import 'auth/utils/role_checker.dart'; // Optional: for role-based redirection
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:digital_certificate_project/recipient_upload_cert/upload_cert.dart'; //temporary
+import 'package:firebase_app_check/firebase_app_check.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // enable debug App Check
+  await FirebaseAppCheck.instance.activate(
+  androidProvider: AndroidProvider.debug,
+
+
+);
+
+//Nk check appchecker tu
+FirebaseAppCheck.instance.getToken(true).then((token) {
+  print('🛡️ Debug token: $token');
+}).catchError((error) {
+  print('❌ Failed to get token: $error');
+});
+
+
+
   print(Firebase.apps); 
   print('🔥 Firebase initialized');// ✅ Confirm Firebase is initialized
   // For testing only
