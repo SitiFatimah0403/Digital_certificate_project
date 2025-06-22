@@ -1,8 +1,14 @@
 import 'package:digital_certificate_project/auth/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
-void main() {
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Required before Firebase use
   runApp(CertificateApp());
 }
 
@@ -16,47 +22,100 @@ class CertificateApp extends StatelessWidget {
     return MaterialApp(
       title: 'Certificate Authority',
       theme: ThemeData(
-        colorScheme: ColorScheme.dark(
+        colorScheme: ColorScheme.light(
           primary: Colors.indigo,
           secondary: Colors.indigoAccent,
-          surface: Colors.grey[900]!,
-          background: Colors.black,
-          brightness: Brightness.dark,
+          surface: Colors.white,
+          background: Colors.grey[100]!,
+          onPrimary: Colors.white,
+          onSecondary: Colors.black,
+          onSurface: Colors.black,
+          onBackground: Colors.white54,
         ),
+        scaffoldBackgroundColor: Colors.grey[100],
         useMaterial3: true,
-        cardTheme: CardThemeData(
+        cardTheme: CardTheme(
+          color: Colors.white,
           elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
+          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.indigo,
             padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
+            textStyle: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.indigo),
           ),
         ),
         appBarTheme: AppBarTheme(
-          elevation: 0,
-          backgroundColor: Colors.grey[900],
-          foregroundColor: Colors.white,
+          elevation: 1,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black87,
+          titleTextStyle: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+          iconTheme: IconThemeData(color: Colors.black87),
         ),
       ),
       home: HomePage(authService: _authService),
       debugShowCheckedModeBanner: false,
     );
   }
+
 }
 
 class Client {
+  String id; // Firestore document ID
   String name;
   String event;
   String issuanceDate;
 
-  Client(this.name, {this.event = '', this.issuanceDate = ''});
+  Client(this.name, {this.id = '', this.event = '', this.issuanceDate = ''});
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'event': event,
+      'issuanceDate': issuanceDate,
+    };
+  }
+
+  factory Client.fromDoc(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Client(
+      data['name'] ?? '',
+      id: doc.id,
+      event: data['event'] ?? '',
+      issuanceDate: data['issuanceDate'] ?? '',
+    );
+  }
 }
+
 
 class HomePage extends StatefulWidget {
   final AuthService authService;
@@ -64,41 +123,122 @@ class HomePage extends StatefulWidget {
 
   @override
   State<HomePage> createState() => _HomePageState();
+
+
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Client> clients = [Client('Client A'), Client('Client B')];
+  List<Client> clients = [
+    Client('Ali Abu Yazid', event: 'Coding Bootcamp', issuanceDate: '2025-06-21'),
+    Client('Yu Ji-min', event: 'Artificial Intelligence Course', issuanceDate: '2025-03-23')
+  ];
+
 
   void _addClient() async {
-    TextEditingController controller = TextEditingController();
+    final nameController = TextEditingController();
+    final eventController = TextEditingController();
+    final dateController = TextEditingController();
 
-    String? newName = await showDialog<String>(
+    final result = await showDialog<Map<String, String>>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text('Add Client'),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(hintText: 'Enter client name'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel'),
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text('Add Client'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                controller: eventController,
+                decoration: InputDecoration(labelText: 'Event'),
+              ),
+              TextField(
+                controller: dateController,
+                decoration: InputDecoration(labelText: 'Issuance Date'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: Text('Add'),
-          ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, {
+                  'name': nameController.text,
+                  'event': eventController.text,
+                  'date': dateController.text,
+                });
+              },
+              child: Text('Add'),
+            ),
+          ],
+        );
+      },
     );
 
-    if (newName != null && newName.trim().isNotEmpty) {
+    if (!mounted || result == null || result['name']!.trim().isEmpty) return;
+
+    final newClient = Client(
+      result['name']!.trim(),
+      event: result['event'] ?? '',
+      issuanceDate: result['date'] ?? '',
+    );
+
+    try {
+      final docRef = await FirebaseFirestore.instance
+          .collection('clients')
+          .add(newClient.toMap());
+
       setState(() {
-        clients.add(Client(newName.trim()));
+        clients.add(Client(
+          newClient.name,
+          event: newClient.event,
+          issuanceDate: newClient.issuanceDate,
+        ));
       });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Client added to Firestore')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error adding client: $e')),
+      );
     }
   }
+
+
+
+
+
+  void _saveNewClient(String name) async {
+    final newClient = Client(name);
+
+    setState(() {
+      clients.add(newClient);
+    });
+
+    try {
+      await FirebaseFirestore.instance.collection('clients').add(newClient.toMap());
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Client added to Firestore')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error adding client to Firestore')),
+      );
+    }
+  }
+
+
 
   void _editClient(int index) async {
     final client = clients[index];
@@ -144,14 +284,42 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    if (result != null) {
-      setState(() {
-        clients[index].name = result['name'] ?? client.name;
-        clients[index].event = result['event'] ?? client.event;
-        clients[index].issuanceDate = result['date'] ?? client.issuanceDate;
-      });
+    // 🛑 Avoid using context if widget is gone
+    if (!mounted || result == null) return;
+
+    setState(() {
+      client.name = result['name'] ?? client.name;
+      client.event = result['event'] ?? client.event;
+      client.issuanceDate = result['date'] ?? client.issuanceDate;
+    });
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('clients')
+          .where('name', isEqualTo: client.name)
+          .get();
+
+      for (var doc in snapshot.docs) {
+        await doc.reference.update(client.toMap());
+      }
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Client updated in Firestore')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error updating client: $e')),
+      );
     }
   }
+
+
+
+
 
   void _goToGenerateCertPage() {
     Navigator.push(
@@ -197,7 +365,7 @@ class _HomePageState extends State<HomePage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.grey[900]!, Colors.black],
+            colors: [Colors.white54, Colors.white],
           ),
         ),
         child: Padding(
@@ -205,36 +373,86 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ElevatedButton.icon(
-                    onPressed: _goToGenerateCertPage,
-                    icon: Icon(Icons.card_membership),
-                    label: Text('Generate Cert'),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _goToGenerateCertPage,
+                      style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(vertical: 16)),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.card_membership, size: 20),
+                          SizedBox(height: 6),
+                          Text(
+                            'Generate Cert',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  ElevatedButton.icon(
-                    onPressed: _goToLtcPage,
-                    icon: Icon(Icons.verified_user),
-                    label: Text('CTC'),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _goToLtcPage,
+                      style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(vertical: 16)),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.verified_user, size: 20),
+                          SizedBox(height: 6),
+                          Text(
+                            'CTC',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _addClient,
+                      style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(vertical: 16)),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.add, size: 20),
+                          SizedBox(height: 6),
+                          Text(
+                            'Add Name',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _viewAll,
+                      style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(vertical: 16)),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.list, size: 20),
+                          SizedBox(height: 6),
+                          Text(
+                            'View All',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
-              SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: _addClient,
-                    icon: Icon(Icons.add),
-                    label: Text('Add Name'),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: _viewAll,
-                    icon: Icon(Icons.list),
-                    label: Text('View All'),
-                  ),
-                ],
-              ),
+
+
               SizedBox(height: 16),
               Expanded(
                 child: ListView.builder(
@@ -280,38 +498,41 @@ class GenerateCertPage extends StatelessWidget {
   final List<Client> clients;
   const GenerateCertPage({super.key, required this.clients});
 
-  void _uploadFile(BuildContext context, String clientName) async {
+  void _uploadFile(BuildContext context, Client client) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+      withData: true,
     );
 
-    if (result != null) {
+    if (result != null && result.files.single.bytes != null) {
       final file = result.files.first;
-      String fileType = file.extension?.toLowerCase() == 'pdf' ? 'PDF' : 'Image';
+      final fileName = '${client.name}_${DateTime.now().millisecondsSinceEpoch}.${file.extension}';
+      final storageRef = FirebaseStorage.instance.ref().child('certificates/$fileName');
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              Icon(
-                file.extension?.toLowerCase() == 'pdf'
-                    ? Icons.picture_as_pdf
-                    : Icons.image,
-                color: Colors.white,
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text('Uploaded $fileType for $clientName: ${file.name}'),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
-        ),
-      );
+      try {
+        await storageRef.putData(file.bytes!);
+        final downloadUrl = await storageRef.getDownloadURL();
+
+        await FirebaseFirestore.instance.collection('clients').add({
+          'name': client.name,
+          'event': client.event,
+          'issuanceDate': client.issuanceDate,
+          'fileUrl': downloadUrl,
+          'fileType': file.extension,
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Uploaded & saved for ${client.name}')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Upload failed: $e')),
+        );
+      }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -347,15 +568,10 @@ class GenerateCertPage extends StatelessWidget {
                       children: [
                         ElevatedButton.icon(
                           icon: Icon(Icons.upload_file),
-                          label: Text("Upload PDF"),
-                          onPressed: () => _uploadFile(context, client.name),
+                          label: Text("Upload File"),
+                          onPressed: () => _uploadFile(context, client),
                         ),
-                        SizedBox(width: 8),
-                        ElevatedButton.icon(
-                          icon: Icon(Icons.image),
-                          label: Text("Upload Photo"),
-                          onPressed: () => _uploadFile(context, client.name),
-                        ),
+
                       ],
                     ),
                   ],
