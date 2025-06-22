@@ -2,14 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'Clientreview_page.dart';
 
-
-
-class ClientVerification extends StatefulWidget {
+class CA_Verification extends StatefulWidget {
   @override
   _CAVerificationState createState() => _CAVerificationState();
 }
 
-class _CAVerificationState extends State<ClientVerification> {
+class _CAVerificationState extends State<CA_Verification> {
   String selectedStatus = 'All';
   final bool useDummyData = true;
 
