@@ -4,12 +4,12 @@ import 'Clientreview_page.dart';
 
 
 
-class CA_ClientVerification extends StatefulWidget {
+class ClientVerification extends StatefulWidget {
   @override
   _CAVerificationState createState() => _CAVerificationState();
 }
 
-class _CAVerificationState extends State<CA_ClientVerification> {
+class _CAVerificationState extends State<ClientVerification> {
   String selectedStatus = 'All';
   final bool useDummyData = true;
 
