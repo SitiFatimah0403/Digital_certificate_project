@@ -22,6 +22,7 @@ class CertificateApp extends StatelessWidget {
     return MaterialApp(
       title: 'Certificate Authority',
       theme: ThemeData(
+        fontFamily: 'RobotoMono',
         colorScheme: ColorScheme.light(
           primary: Colors.indigo,
           secondary: Colors.indigoAccent,
@@ -45,7 +46,7 @@ class CertificateApp extends StatelessWidget {
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             foregroundColor: Colors.white,
-            backgroundColor: Colors.indigo,
+            backgroundColor: Color.fromARGB(181, 0, 0, 0),
             padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -70,17 +71,19 @@ class CertificateApp extends StatelessWidget {
             borderSide: BorderSide(color: Colors.indigo),
           ),
         ),
-        appBarTheme: AppBarTheme(
-          elevation: 1,
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black87,
+        appBarTheme: const AppBarTheme(
+          elevation: 0,
+          backgroundColor: Color.fromARGB(181, 0, 0, 0), // Your custom black color
+          foregroundColor: Colors.white,
           titleTextStyle: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontFamily: 'RobotoMono',
             fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
-          iconTheme: IconThemeData(color: Colors.black87),
+          iconTheme: IconThemeData(color: Colors.white),
         ),
+
       ),
       home: HomePage(authService: _authService),
       debugShowCheckedModeBanner: false,
@@ -568,7 +571,7 @@ class GenerateCertPage extends StatelessWidget {
                       children: [
                         ElevatedButton.icon(
                           icon: Icon(Icons.upload_file),
-                          label: Text("Upload File"),
+                          label: Text("Upload Cert"),
                           onPressed: () => _uploadFile(context, client),
                         ),
 
