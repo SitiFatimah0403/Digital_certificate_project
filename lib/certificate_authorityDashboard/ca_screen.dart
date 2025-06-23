@@ -24,7 +24,7 @@ class CertificateApp extends StatelessWidget {
     return MaterialApp(
       title: 'Certificate Authority',
       theme: ThemeData(
-        fontFamily: 'RobotoMono',
+
         colorScheme: ColorScheme.light(
           primary: Colors.indigo,
           secondary: Colors.indigoAccent,
