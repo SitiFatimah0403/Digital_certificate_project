@@ -9,7 +9,7 @@ class CA_Verification extends StatefulWidget {
 
 class _CAVerificationState extends State<CA_Verification> {
   String selectedStatus = 'All';
-  final bool useDummyData = true;
+  final bool useDummyData = false;
 
   final List<Map<String, dynamic>> dummyDocuments = [
     {
@@ -50,6 +50,7 @@ class _CAVerificationState extends State<CA_Verification> {
 
   Stream<QuerySnapshot> getDocumentsStream() {
     var collection = FirebaseFirestore.instance.collection('truecopies');
+
     if (selectedStatus == 'All') {
       return collection.orderBy('upload_date', descending: true).snapshots();
     } else {
@@ -207,7 +208,7 @@ class _CAVerificationState extends State<CA_Verification> {
                         builder:
                             (_) => ReviewPage(
                               docId: docId,
-                              metadata: metadata,
+                              metadata: {}, // ← this will be ignored
                               status: status,
                             ),
                       ),
@@ -215,6 +216,7 @@ class _CAVerificationState extends State<CA_Verification> {
                   },
                   child: Text('REVIEW'),
                 ),
+
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
