@@ -48,7 +48,7 @@ class CertificateApp extends StatelessWidget {
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             foregroundColor: Colors.white,
-            backgroundColor: Color.fromARGB(181, 0, 0, 0),
+            backgroundColor: Color.fromARGB(255, 0, 0, 0),
             padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -483,7 +483,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         trailing: IconButton(
-                          icon: Icon(Icons.edit, color: Colors.indigoAccent),
+                          icon: Icon(Icons.edit, color: Colors.black),
                           onPressed: () => _editClient(index),
                         ),
                       ),
