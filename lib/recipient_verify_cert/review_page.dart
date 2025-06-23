@@ -48,22 +48,28 @@ class _ReviewPageState extends State<ReviewPage> {
   bool isLoading = false;
 
   final FirestoreService _firestoreService = FirestoreService();
+  bool useDummyMode = true; // Toggle to false when ready for real Firestore
 
-  // Updates the document status in Firestore using the service class
+  // Updates the document status (dummy or real)
   Future<void> updateStatus(BuildContext context, String newStatus) async {
     setState(() => isLoading = true);
 
     try {
-      await _firestoreService.updateCertificateStatus(widget.docId, newStatus);
+      if (useDummyMode) {
+        await Future.delayed(Duration(seconds: 1)); // Simulate delay
+      } else {
+        await _firestoreService.updateCertificateStatus(widget.docId, newStatus);
+      }
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Status updated to $newStatus')));
-      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Status updated to $newStatus${useDummyMode }')),
+      );
+      Navigator.pop(context, newStatus); // Send the updated status back
+
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to update status: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update status: $e')),
+      );
     } finally {
       setState(() => isLoading = false);
     }
@@ -73,30 +79,29 @@ class _ReviewPageState extends State<ReviewPage> {
   void _showConfirmationDialog(BuildContext context, String newStatus) {
     showDialog(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            title: Text('Confirm $newStatus'),
-            content: Text(
-              'Are you sure you want to mark this certificate as "$newStatus"?',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  updateStatus(context, newStatus);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      newStatus == 'Approved' ? Colors.green : Colors.red,
-                ),
-                child: Text('Yes, $newStatus'),
-              ),
-            ],
+      builder: (_) => AlertDialog(
+        title: Text('Confirm $newStatus'),
+        content: Text(
+          'Are you sure you want to mark this certificate as "$newStatus"?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
           ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              updateStatus(context, newStatus);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  newStatus == 'Approved' ? Colors.green : Colors.red,
+            ),
+            child: Text('Yes, $newStatus'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -104,55 +109,43 @@ class _ReviewPageState extends State<ReviewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Review Certificate Document')),
-      body:
-          isLoading
-              ? Center(child: CircularProgressIndicator())
-              : Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    StatusBanner(status: widget.status),
-                    SizedBox(height: 20),
-                    MetadataSection(metadata: widget.metadata),
-                    SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed:
-                                () => _showConfirmationDialog(
-                                  context,
-                                  'Approved',
-                                ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                            ),
-                            child: Text('Approve'),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  StatusBanner(status: widget.status),
+                  SizedBox(height: 20),
+                  MetadataSection(metadata: widget.metadata),
+                  SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => _showConfirmationDialog(context, 'Approved'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
                           ),
+                          child: Text('Approve'),
                         ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed:
-                                () => _showConfirmationDialog(
-                                  context,
-                                  'Rejected',
-                                ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                            ),
-                            child: Text('Reject'),
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => _showConfirmationDialog(context, 'Rejected'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
                           ),
+                          child: Text('Reject'),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
+            ),
     );
   }
 }
-
-
-

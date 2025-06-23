@@ -4,6 +4,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'generate_cert.dart'; // Add this at the top
+
 
 
 void main() async {
@@ -22,6 +24,7 @@ class CertificateApp extends StatelessWidget {
     return MaterialApp(
       title: 'Certificate Authority',
       theme: ThemeData(
+
         colorScheme: ColorScheme.light(
           primary: Colors.indigo,
           secondary: Colors.indigoAccent,
@@ -45,7 +48,7 @@ class CertificateApp extends StatelessWidget {
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             foregroundColor: Colors.white,
-            backgroundColor: Colors.indigo,
+            backgroundColor: Color.fromARGB(255, 0, 0, 0),
             padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -70,17 +73,19 @@ class CertificateApp extends StatelessWidget {
             borderSide: BorderSide(color: Colors.indigo),
           ),
         ),
-        appBarTheme: AppBarTheme(
-          elevation: 1,
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black87,
+        appBarTheme: const AppBarTheme(
+          elevation: 0,
+          backgroundColor: Color.fromARGB(181, 0, 0, 0), // Your custom black color
+          foregroundColor: Colors.white,
           titleTextStyle: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontFamily: 'RobotoMono',
             fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
-          iconTheme: IconThemeData(color: Colors.black87),
+          iconTheme: IconThemeData(color: Colors.white),
         ),
+
       ),
       home: HomePage(authService: _authService),
       debugShowCheckedModeBanner: false,
@@ -478,7 +483,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         trailing: IconButton(
-                          icon: Icon(Icons.edit, color: Colors.indigoAccent),
+                          icon: Icon(Icons.edit, color: Colors.black),
                           onPressed: () => _editClient(index),
                         ),
                       ),
@@ -543,7 +548,7 @@ class GenerateCertPage extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.grey[900]!, Colors.black],
+            colors: [Colors.white, Colors.white],
           ),
         ),
         child: ListView.builder(
@@ -568,7 +573,7 @@ class GenerateCertPage extends StatelessWidget {
                       children: [
                         ElevatedButton.icon(
                           icon: Icon(Icons.upload_file),
-                          label: Text("Upload File"),
+                          label: Text("Upload Cert"),
                           onPressed: () => _uploadFile(context, client),
                         ),
 
@@ -598,7 +603,7 @@ class ViewAllPage extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.grey[900]!, Colors.black],
+            colors: [Colors.white , Colors.white],
           ),
         ),
         child: ListView.builder(
