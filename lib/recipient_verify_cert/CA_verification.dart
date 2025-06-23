@@ -50,6 +50,17 @@ class _CAVerificationState extends State<CA_Verification> {
       },
       'status': 'rejected',
     },
+    {
+      'id': 'doc4',
+      'metadata': {
+        'name': 'Ali Bin Zain',
+        'document_type': 'SPM Certificate',
+        'date_issued': '2025-06-26T00:00:00',
+        'expiry_date': '2025-06-30T00:00:00',
+        'organization': 'KAKNGAH UNIVERSITY',
+      },
+      'status': 'pending',
+    },
   ];
 
   // Firestore query for live documents (used if useDummyData is false)
