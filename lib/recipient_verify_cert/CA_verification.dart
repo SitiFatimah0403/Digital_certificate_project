@@ -206,19 +206,28 @@ class _CAVerificationState extends State<CA_Verification> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (_) => ReviewPage(
-                          docId: docId,
-                          metadata: metadata,
-                          status: status,
-                        ),
-                  ),
-                );
-              },
+              onPressed: () async {
+  final result = await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => ReviewPage(
+        docId: docId,
+        metadata: metadata,
+        status: status,
+      ),
+    ),
+  );
+
+  if (result == 'Approved' || result == 'Rejected') {
+    setState(() {
+      final index = dummyDocuments.indexWhere((doc) => doc['id'] == docId);
+      if (index != -1) {
+        dummyDocuments[index]['status'] = result.toLowerCase();
+      }
+    });
+  }
+},
+
               child: Text('REVIEW', style: TextStyle(color: Colors.blue)),
             ),
             SizedBox(width: 8),
