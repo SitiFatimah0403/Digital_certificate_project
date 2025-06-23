@@ -603,7 +603,7 @@ class ViewAllPage extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.white, Colors.white],
+            colors: [Colors.white , Colors.white],
           ),
         ),
         child: ListView.builder(
