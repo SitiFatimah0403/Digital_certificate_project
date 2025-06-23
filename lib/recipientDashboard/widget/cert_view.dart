@@ -1,5 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../utils/cert_json.dart';
+import 'package:intl/intl.dart';
 import 'cert_detail_page.dart';
 
 class CertView extends StatelessWidget {
@@ -7,19 +8,52 @@ class CertView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column( // relying on parent ListView to handle scrolling
-      children:
-          certList.map((cert) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('recipientCert').snapshots(),
+      builder: (context, snapshot) {
+        print("Firestore connection state: ${snapshot.connectionState}");
+        print("Has error: ${snapshot.hasError}");
+        print("Docs: ${snapshot.data?.docs.length}");
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return const Center(child: Text('No certificates found.'));
+        }
+
+        final certs = snapshot.data!.docs;
+
+        return ListView(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.only(top: 20, bottom: 20),
+          children: certs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+
+            // Format Firestore Timestamp to readable string
+            String formattedDate = 'Unknown';
+            if (data['issuanceDate'] is Timestamp) {
+              final timestamp = data['issuanceDate'] as Timestamp;
+              formattedDate =
+                  DateFormat('MMMM d, yyyy').format(timestamp.toDate());
+            } else if (data['issuanceDate'] is String) {
+              formattedDate = data['issuanceDate'];
+            }
+
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: CertCard(
-                certName: cert['certName'],
-                receivedDate: cert['receivedDate'],
+                certName: data['Name'] ?? 'Unknown',
+                receivedDate: formattedDate,
                 onMorePressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => CertDetailPage(cert: cert),
+                      builder: (context) => CertDetailPage(cert: data),
                     ),
                   );
                 },
@@ -27,6 +61,8 @@ class CertView extends StatelessWidget {
               ),
             );
           }).toList(),
+        );
+      },
     );
   }
 }
@@ -50,15 +86,8 @@ class CertCard extends StatelessWidget {
     return Container(
       height: 120,
       decoration: BoxDecoration(
-        color: const Color(0xCDFFFFFF),
+        color: const Color(0xFFECEAEA),
         borderRadius: BorderRadius.circular(21),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1), // Shadow color with opacity
-            blurRadius: 10, // Soften the shadow
-            offset: Offset(0, 4), // Move shadow downwards
-          ),
-        ],
       ),
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -67,10 +96,9 @@ class CertCard extends StatelessWidget {
             radius: 30,
             backgroundColor: Colors.grey[300],
             backgroundImage: certImage,
-            child:
-                certImage == null
-                    ? const Icon(Icons.person, size: 30, color: Colors.black54)
-                    : null,
+            child: certImage == null
+                ? const Icon(Icons.person, size: 30, color: Colors.black54)
+                : null,
           ),
           const SizedBox(width: 16),
           Expanded(

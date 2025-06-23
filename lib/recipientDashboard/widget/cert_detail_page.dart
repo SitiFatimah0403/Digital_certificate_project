@@ -9,7 +9,7 @@ class CertDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(cert['certName']),
+        title: Text(cert['file']),
       ),
       body: Center(
         child: Text('You received this certificate on ${cert['receivedDate']}'),
