@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../recipient_upload_cert/upload_cert.dart';
 import 'review_page.dart';
 
-// This screen is for CA to verify and review submitted certificates
 class CA_Verification extends StatefulWidget {
   @override
   _CAVerificationState createState() => _CAVerificationState();
@@ -12,10 +11,8 @@ class CA_Verification extends StatefulWidget {
 class _CAVerificationState extends State<CA_Verification> {
   String selectedStatus = 'All';
 
-  // Toggle between dummy data and real Firestore
   final bool useDummyData = true;
 
-  // Sample certificates for testing without database connection
   final List<Map<String, dynamic>> dummyDocuments = [
     {
       'id': 'doc1',
@@ -63,7 +60,6 @@ class _CAVerificationState extends State<CA_Verification> {
     },
   ];
 
-  // Firestore query for live documents (used if useDummyData is false)
   Stream<QuerySnapshot> getDocumentsStream() {
     var collection = FirebaseFirestore.instance.collection('truecopies');
     if (selectedStatus == 'All') {
@@ -76,7 +72,6 @@ class _CAVerificationState extends State<CA_Verification> {
     }
   }
 
-  // Assign colors based on document status
   Color getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'approved':
@@ -92,7 +87,6 @@ class _CAVerificationState extends State<CA_Verification> {
   Widget build(BuildContext context) {
     final filters = ['All', 'Pending', 'Approved', 'Rejected'];
 
-    // Filter dummy docs based on selected status
     final filteredDocs =
         selectedStatus == 'All'
             ? dummyDocuments
@@ -105,25 +99,62 @@ class _CAVerificationState extends State<CA_Verification> {
                 .toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Certification Approval Dashboard'),
-        actions: [CircleAvatar(child: Text('CA')), SizedBox(width: 10)],
+      backgroundColor: Color(0xFFFAF4F9),
+     appBar: AppBar(
+  backgroundColor: const Color.fromARGB(255, 2, 2, 2),
+  title: Text(
+    'Certification Approval Dashboard',
+    style: TextStyle(
+      color: Colors.white,
+      fontFamily: 'RobotoMono',
+      fontSize: 16 // Ensure this matches the font name in pubspec.yaml
+    ),
+  ),
+  actions: [
+    CircleAvatar(
+      backgroundColor: Colors.white,
+      child: Text(
+        'CA',
+        style: TextStyle(
+          color: Colors.black,
+          fontFamily: 'RobotoMono',
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        ),
       ),
+    ),
+    SizedBox(width: 10),
+  ],
+),
+
       body: Column(
         children: [
-          // Status filter chips
-          Wrap(
-            spacing: 8,
-            children:
-                filters.map((status) {
-                  return ChoiceChip(
-                    label: Text(status),
-                    selected: selectedStatus == status,
-                    onSelected: (_) => setState(() => selectedStatus = status),
-                  );
-                }).toList(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Wrap(
+              spacing: 8,
+              children:
+                  filters.map((status) {
+                    return ChoiceChip(
+                      label: Text(
+                        status,
+                        style: TextStyle(
+                          color:
+                              selectedStatus == status
+                                  ? Colors.white
+                                  : const Color.fromARGB(255, 0, 0, 0),
+                        ),
+                      ),
+                      selected: selectedStatus == status,
+                      selectedColor: const Color.fromARGB(255, 3, 3, 3),
+                      checkmarkColor: Colors.white,
+                      backgroundColor: Colors.white,
+                      onSelected:
+                          (_) => setState(() => selectedStatus = status),
+                    );
+                  }).toList(),
+            ),
           ),
-          // Display either dummy or real document list
           Expanded(
             child:
                 useDummyData
@@ -173,82 +204,121 @@ class _CAVerificationState extends State<CA_Verification> {
           ),
         ],
       ),
-      // Upload button (used for testing or future expansion)
       floatingActionButton: FloatingActionButton(
         onPressed:
             () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => UploadScreen()),
             ),
-        child: Icon(Icons.add),
+        backgroundColor: const Color.fromARGB(255, 5, 5, 5),
+        child: Icon(Icons.add, color: Colors.white),
       ),
     );
   }
 
-  // Renders one certificate row with metadata and a review button
   Widget buildListTile({
     required String docId,
     required Map<String, dynamic> metadata,
     required String status,
   }) {
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: ListTile(
-        title: Text(metadata['name'] ?? 'Unknown'),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(metadata['document_type'] ?? ''),
-            Text(metadata['date_issued']?.split('T')?.first ?? ''),
-          ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextButton(
-              onPressed: () async {
-  final result = await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => ReviewPage(
-        docId: docId,
-        metadata: metadata,
-        status: status,
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 255, 255, 255),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        ],
       ),
-    ),
-  );
-
-  if (result == 'Approved' || result == 'Rejected') {
-    setState(() {
-      final index = dummyDocuments.indexWhere((doc) => doc['id'] == docId);
-      if (index != -1) {
-        dummyDocuments[index]['status'] = result.toLowerCase();
-      }
-    });
-  }
-},
-
-              child: Text('REVIEW', style: TextStyle(color: Colors.blue)),
+      child: Row(
+        children: [
+          
+          SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  metadata['name'] ?? 'Unknown',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    fontSize: 16,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  metadata['document_type'] ?? '',
+                  style: TextStyle(fontSize: 14, color: Colors.black87),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Received on: ${metadata['date_issued']?.split('T')?.first ?? ''}',
+                  style: TextStyle(fontSize: 13, color: Colors.black54),
+                ),
+              ],
             ),
-            SizedBox(width: 8),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: getStatusColor(status),
-                borderRadius: BorderRadius.circular(12),
+          ),
+          Column(
+            children: [
+              TextButton(
+                onPressed: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (_) => ReviewPage(
+                            docId: docId,
+                            metadata: metadata,
+                            status: status,
+                          ),
+                    ),
+                  );
+
+                  if (result == 'Approved' || result == 'Rejected') {
+                    setState(() {
+                      final index = dummyDocuments.indexWhere(
+                        (doc) => doc['id'] == docId,
+                      );
+                      if (index != -1) {
+                        dummyDocuments[index]['status'] = result.toLowerCase();
+                      }
+                    });
+                  }
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(color: Colors.black12),
+                  ),
+                ),
+                child: Text('View'),
               ),
-              child: Text(
-                status.capitalize(),
-                style: TextStyle(color: Colors.white),
+              SizedBox(height: 6),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: getStatusColor(status),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  status.capitalize(),
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
 extension StringExtension on String {
-  String capitalize() => '${this[0].toUpperCase()}${substring(1)}';
+  String capitalize() =>
+      this.isNotEmpty ? '${this[0].toUpperCase()}${substring(1)}' : this;
 }
