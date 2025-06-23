@@ -82,7 +82,7 @@ dependencies:
   uuid: ^4.0.0
   syncfusion_flutter_pdf: ^24.2.3
   firebase_storage: ^11.6.5
-
+  syncfusion_flutter_pdfviewer: any #untuk view the pdf
 
 
 
@@ -114,6 +114,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
+    - assets/pdfs/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
