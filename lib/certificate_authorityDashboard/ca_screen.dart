@@ -4,6 +4,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'generate_cert.dart'; // Add this at the top
+
 
 
 void main() async {
@@ -546,7 +548,7 @@ class GenerateCertPage extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.grey[900]!, Colors.black],
+            colors: [Colors.white, Colors.white],
           ),
         ),
         child: ListView.builder(
@@ -601,7 +603,7 @@ class ViewAllPage extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.grey[900]!, Colors.black],
+            colors: [Colors.white, Colors.white],
           ),
         ),
         child: ListView.builder(
