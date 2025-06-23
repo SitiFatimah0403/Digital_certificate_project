@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../recipient_upload_cert/upload_cert.dart';
-import 'review_page.dart';
+import 'Clientreview_page.dart';
 
-// This screen is for CA to verify and review submitted certificates
 class CA_Verification extends StatefulWidget {
   @override
   _CAVerificationState createState() => _CAVerificationState();
@@ -11,22 +9,20 @@ class CA_Verification extends StatefulWidget {
 
 class _CAVerificationState extends State<CA_Verification> {
   String selectedStatus = 'All';
-
-  // Toggle between dummy data and real Firestore
   final bool useDummyData = true;
 
-  // Sample certificates for testing without database connection
   final List<Map<String, dynamic>> dummyDocuments = [
     {
       'id': 'doc1',
-      'metadata': {
-        'name': 'Ayda Bin Jebat',
-        'document_type': 'Diploma',
-        'date_issued': '2024-05-01T00:00:00',
-        'expiry_date': '2029-05-01T00:00:00',
-        'organization': 'Example University',
+      "status": "pending",
+      "upload_date": "2024-06-21T12:00:00Z",
+      "metadata": {
+        "name": "Ayda Bin Jebat",
+        "document_type": "Diploma",
+        "date_issued": "2024-05-01",
+        "expiry_date": "2029-05-01",
+        "organization": "Example University",
       },
-      'status': 'pending',
     },
     {
       'id': 'doc2',
@@ -50,20 +46,8 @@ class _CAVerificationState extends State<CA_Verification> {
       },
       'status': 'rejected',
     },
-    {
-      'id': 'doc4',
-      'metadata': {
-        'name': 'Ali Bin Zain',
-        'document_type': 'SPM Certificate',
-        'date_issued': '2025-06-26T00:00:00',
-        'expiry_date': '2025-06-30T00:00:00',
-        'organization': 'KAKNGAH UNIVERSITY',
-      },
-      'status': 'pending',
-    },
   ];
 
-  // Firestore query for live documents (used if useDummyData is false)
   Stream<QuerySnapshot> getDocumentsStream() {
     var collection = FirebaseFirestore.instance.collection('truecopies');
     if (selectedStatus == 'All') {
@@ -76,7 +60,6 @@ class _CAVerificationState extends State<CA_Verification> {
     }
   }
 
-  // Assign colors based on document status
   Color getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'approved':
@@ -91,8 +74,6 @@ class _CAVerificationState extends State<CA_Verification> {
   @override
   Widget build(BuildContext context) {
     final filters = ['All', 'Pending', 'Approved', 'Rejected'];
-
-    // Filter dummy docs based on selected status
     final filteredDocs =
         selectedStatus == 'All'
             ? dummyDocuments
@@ -107,23 +88,24 @@ class _CAVerificationState extends State<CA_Verification> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Certification Approval Dashboard'),
-        actions: [CircleAvatar(child: Text('CA')), SizedBox(width: 10)],
+        actions: [CircleAvatar(child: Text('CL')), SizedBox(width: 10)],
       ),
       body: Column(
         children: [
-          // Status filter chips
           Wrap(
             spacing: 8,
             children:
-                filters.map((status) {
-                  return ChoiceChip(
-                    label: Text(status),
-                    selected: selectedStatus == status,
-                    onSelected: (_) => setState(() => selectedStatus = status),
-                  );
-                }).toList(),
+                filters
+                    .map(
+                      (status) => ChoiceChip(
+                        label: Text(status),
+                        selected: selectedStatus == status,
+                        onSelected:
+                            (_) => setState(() => selectedStatus = status),
+                      ),
+                    )
+                    .toList(),
           ),
-          // Display either dummy or real document list
           Expanded(
             child:
                 useDummyData
@@ -131,13 +113,10 @@ class _CAVerificationState extends State<CA_Verification> {
                       itemCount: filteredDocs.length,
                       itemBuilder: (context, index) {
                         final doc = filteredDocs[index];
-                        final metadata = doc['metadata'];
-                        final status = doc['status'];
-
                         return buildListTile(
-                          docId: doc['id'],
-                          metadata: metadata,
-                          status: status,
+                          docId: doc['id'] ?? '',
+                          metadata: doc['metadata'],
+                          status: doc['status'],
                         );
                       },
                     )
@@ -147,12 +126,10 @@ class _CAVerificationState extends State<CA_Verification> {
                         if (!snapshot.hasData) {
                           return Center(child: CircularProgressIndicator());
                         }
-
                         final docs = snapshot.data!.docs;
                         if (docs.isEmpty) {
                           return Center(child: Text("No documents found."));
                         }
-
                         return ListView.builder(
                           itemCount: docs.length,
                           itemBuilder: (context, index) {
@@ -160,7 +137,6 @@ class _CAVerificationState extends State<CA_Verification> {
                             final metadata = doc['metadata'] ?? {};
                             final status =
                                 (doc['status'] ?? 'pending').toString();
-
                             return buildListTile(
                               docId: doc.id,
                               metadata: metadata,
@@ -173,74 +149,88 @@ class _CAVerificationState extends State<CA_Verification> {
           ),
         ],
       ),
-      // Upload button (used for testing or future expansion)
-      floatingActionButton: FloatingActionButton(
-        onPressed:
-            () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => UploadScreen()),
-            ),
-        child: Icon(Icons.add),
-      ),
     );
   }
 
-  // Renders one certificate row with metadata and a review button
   Widget buildListTile({
     required String docId,
     required Map<String, dynamic> metadata,
     required String status,
   }) {
+    String name = metadata['name']?.toString() ?? 'Unknown';
+    String type = metadata['document_type']?.toString() ?? 'Document';
+    String issued = metadata['date_issued']?.split('T')?.first ?? '';
+    String expiry = metadata['expiry_date']?.split('T')?.first ?? '';
+    String org = metadata['organization']?.toString() ?? 'Unknown Organization';
+
     return Card(
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: ListTile(
-        title: Text(metadata['name'] ?? 'Unknown'),
-        subtitle: Column(
+      margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(metadata['document_type'] ?? ''),
-            Text(metadata['date_issued']?.split('T')?.first ?? ''),
-          ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextButton(
-              onPressed: () async {
-  final result = await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => ReviewPage(
-        docId: docId,
-        metadata: metadata,
-        status: status,
-      ),
-    ),
-  );
-
-  if (result == 'Approved' || result == 'Rejected') {
-    setState(() {
-      final index = dummyDocuments.indexWhere((doc) => doc['id'] == docId);
-      if (index != -1) {
-        dummyDocuments[index]['status'] = result.toLowerCase();
-      }
-    });
-  }
-},
-
-              child: Text('REVIEW', style: TextStyle(color: Colors.blue)),
+            // Top: Name and Type
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  type,
+                  style: TextStyle(fontSize: 15, color: Colors.grey[700]),
+                ),
+              ],
             ),
-            SizedBox(width: 8),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: getStatusColor(status),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                status.capitalize(),
-                style: TextStyle(color: Colors.white),
-              ),
+            Divider(height: 20, thickness: 1.2),
+
+            // Organization and Dates (Plain Text)
+            Text("Organization: $org", style: TextStyle(fontSize: 14)),
+            SizedBox(height: 6),
+            Text("Issued: $issued", style: TextStyle(fontSize: 14)),
+            Text("Expires: $expiry", style: TextStyle(fontSize: 14)),
+            SizedBox(height: 12),
+
+            // Buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (_) => ReviewPage(
+                              docId: docId,
+                              metadata: metadata,
+                              status: status,
+                            ),
+                      ),
+                    );
+                  },
+                  child: Text('REVIEW'),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: getStatusColor(status),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    status.capitalize(),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -250,5 +240,6 @@ class _CAVerificationState extends State<CA_Verification> {
 }
 
 extension StringExtension on String {
-  String capitalize() => '${this[0].toUpperCase()}${substring(1)}';
+  String capitalize() =>
+      isEmpty ? '' : '${this[0].toUpperCase()}${substring(1)}';
 }
