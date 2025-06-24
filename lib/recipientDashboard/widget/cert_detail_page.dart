@@ -11,30 +11,30 @@ class CertDetailPage extends StatefulWidget {
 }
 
 class _CertDetailPageState extends State<CertDetailPage> {
-  late PdfControllerPinch pdfController;
+  PdfControllerPinch? pdfController;
 
   @override
   void initState() {
     super.initState();
-
-    final String pdfFile = widget.cert['file'] ?? 'default.pdf';
-
+    final String fileName = widget.cert['file'] ?? 'default.pdf';
     pdfController = PdfControllerPinch(
-      document: PdfDocument.openAsset('assets/pdfs/$pdfFile'),
+      document: PdfDocument.openAsset('assets/pdfs/$fileName'),
     );
   }
 
   @override
   void dispose() {
-    pdfController.dispose();
+    pdfController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('View Certificate')),
-      body: PdfViewPinch(controller: pdfController),
+      appBar: AppBar(title: Text(widget.cert['Name'] ?? 'View Certificate')),
+      body: pdfController == null
+          ? const Center(child: CircularProgressIndicator())
+          : PdfViewPinch(controller: pdfController!),
     );
   }
 }
