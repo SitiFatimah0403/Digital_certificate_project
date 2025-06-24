@@ -58,6 +58,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-analytics")
     // Add other Firebase dependencies here if needed
+    implementation("com.google.firebase:firebase-appcheck-debug")
 
     /*The Firebase Android BoM (Bill of Materials) enables you to manage all your Firebase library versions by specifying only one version — the BoM's version. */
     
