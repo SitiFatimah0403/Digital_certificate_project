@@ -19,6 +19,7 @@ import 'auth/utils/role_checker.dart'; // Optional: for role-based redirection
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:digital_certificate_project/recipient_upload_cert/upload_cert.dart'; //temporary
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:digital_certificate_project/viewerDashboard/viewerScreen.dart'; 
 
 
 
@@ -62,8 +63,8 @@ class MyApp extends StatelessWidget {
       title: 'Digital Certificate Repository',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.grey),
-      home: AuthWrapper(), // controls where to go after startup
-      //home: UploadScreen(), // temporary to test UploadScreen
+      //home: AuthWrapper(), // controls where to go after startup
+      home: Viewerscreen(), // temporary to test Recipient screen
       routes: {
         '/login': (context) => LoginScreen(),
         '/Signup': (context) => SignUpScreen(),
@@ -71,7 +72,7 @@ class MyApp extends StatelessWidget {
         '/caDashboard': (context) => CertificateApp(),
         '/recipientDashboard': (context) => BottomNavbar(),
         '/clientDashboard': (context) => ClientScreen(),
-        '/viewerDashboard': (context) => PlaceholderScreen('Viewer'),
+        '/viewerDashboard': (context) => Viewerscreen(),
       },
     );
   }
