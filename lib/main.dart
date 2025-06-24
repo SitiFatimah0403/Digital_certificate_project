@@ -23,16 +23,18 @@ import 'package:digital_certificate_project/viewerDashboard/viewerScreen.dart';
 
 
 
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // enable debug App Check
-  await FirebaseAppCheck.instance.activate(
+await FirebaseAppCheck.instance.activate(
   androidProvider: AndroidProvider.debug,
-
-
+  //isTokenAutoRefreshEnabled: true,
 );
+
 
 //Nk check appchecker tu
 FirebaseAppCheck.instance.getToken(true).then((token) {
