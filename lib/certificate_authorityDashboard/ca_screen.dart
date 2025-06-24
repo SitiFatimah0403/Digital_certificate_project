@@ -37,7 +37,7 @@ class CertificateApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: Colors.grey[100],
         useMaterial3: true,
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 4,
           shape: RoundedRectangleBorder(
