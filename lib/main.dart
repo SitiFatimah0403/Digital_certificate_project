@@ -47,7 +47,7 @@ FirebaseAppCheck.instance.getToken(true).then((token) {
 
   print(Firebase.apps); 
   print('🔥 Firebase initialized');// ✅ Confirm Firebase is initialized
-  // For testing only
+  // For testing only - macam dah takleh guna, tapi jangan remove
   /*if (FirebaseAuth.instance.currentUser == null) {
     await FirebaseAuth.instance.signInAnonymously();
   }*/
@@ -65,8 +65,8 @@ class MyApp extends StatelessWidget {
       title: 'Digital Certificate Repository',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.grey),
-      //home: AuthWrapper(), // controls where to go after startup
-      home: Viewerscreen(), // temporary to test Recipient screen
+      home: AuthWrapper(), // controls where to go after startup
+      //home: Viewerscreen(), // temporary to test Recipient screen
       routes: {
         '/login': (context) => LoginScreen(),
         '/Signup': (context) => SignUpScreen(),
