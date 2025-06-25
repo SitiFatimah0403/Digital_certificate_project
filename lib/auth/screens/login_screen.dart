@@ -43,7 +43,7 @@ void _handleGoogleSignIn() async {
         });
       }
 
-      // Get the role from Firestore
+  // Get the role from Firestore
       final role = await firestoreService.getUserRole(uid);
 
       if (role != null) {

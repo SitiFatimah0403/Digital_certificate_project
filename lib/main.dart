@@ -69,7 +69,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginScreen(),
         '/Signup': (context) => SignUpScreen(),
-        '/adminDashboard': (context) => PlaceholderScreen('Admin Dashboard'),// ni tak de
+        //'/adminDashboard': (context) => AdminDashboard(),
         '/caDashboard': (context) => CertificateApp(),
         '/recipientDashboard': (context) => BottomNavbar(),
         '/clientDashboard': (context) => ClientScreen(),
