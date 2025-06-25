@@ -586,6 +586,7 @@ class GenerateCertFirestorePage extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text("Event: ${data['title'] ?? 'No title'}"),
                       Text("Issuance Date: ${data['date'] ?? 'No date'}"),
+                      Text("Time requested: ${data['timestamp'] ?? 'No time'}"),
                       if (timestamp != null)
                         Text("Uploaded At: $readableTime", style: TextStyle(color: Colors.grey[700])),
                       const SizedBox(height: 8),

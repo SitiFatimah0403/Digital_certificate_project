@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:intl/intl.dart';
 
 class GenerateCertPage extends StatelessWidget {
   const GenerateCertPage({super.key});
@@ -29,7 +30,6 @@ class GenerateCertPage extends StatelessWidget {
     }
   }
 
-
   void _uploadFile(BuildContext context, Map<String, dynamic> data) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -46,10 +46,9 @@ class GenerateCertPage extends StatelessWidget {
         await storageRef.putData(file.bytes!);
         final downloadUrl = await storageRef.getDownloadURL();
 
-        // Save certificate metadata to a separate collection (not requestCert!)
         await FirebaseFirestore.instance.collection('issuedCerts').add({
           'name': data['name'],
-          'title': data['title'],           // Use original field name
+          'title': data['title'],
           'issuanceDate': data['date'],
           'fileUrl': downloadUrl,
           'fileType': file.extension,
@@ -91,6 +90,11 @@ class GenerateCertPage extends StatelessWidget {
             itemCount: dataList.length,
             itemBuilder: (context, index) {
               final data = dataList[index];
+              final timestamp = data['timestamp'] as Timestamp?;
+              final formattedTimestamp = timestamp != null
+                  ? DateFormat('dd MMMM yyyy – hh:mm a').format(timestamp.toDate())
+                  : 'No time';
+
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 child: Padding(
@@ -103,6 +107,7 @@ class GenerateCertPage extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text("Event: ${data['title'] ?? 'No title'}"),
                       Text("Issuance Date: ${data['date'] ?? 'No date'}"),
+                      Text("Time requested: $formattedTimestamp"),
                       const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -125,6 +130,7 @@ class GenerateCertPage extends StatelessWidget {
     );
   }
 }
+
 
 
 
