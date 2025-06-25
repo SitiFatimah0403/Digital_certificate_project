@@ -49,7 +49,7 @@ class _CAVerificationState extends State<CA_Verification> {
   ];
 
   Stream<QuerySnapshot> getDocumentsStream() {
-    var collection = FirebaseFirestore.instance.collection('truecopies');
+    var collection = FirebaseFirestore.instance.collection('clientPage');
 
     if (selectedStatus == 'All') {
       return collection.orderBy('upload_date', descending: true).snapshots();
@@ -124,20 +124,44 @@ class _CAVerificationState extends State<CA_Verification> {
                     : StreamBuilder<QuerySnapshot>(
                       stream: getDocumentsStream(),
                       builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return Center(child: CircularProgressIndicator());
                         }
-                        final docs = snapshot.data!.docs;
-                        if (docs.isEmpty) {
+
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Text("Error: ${snapshot.error}"),
+                          );
+                        }
+
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                           return Center(child: Text("No documents found."));
                         }
+
+                        final docs = snapshot.data!.docs;
+
                         return ListView.builder(
                           itemCount: docs.length,
                           itemBuilder: (context, index) {
                             final doc = docs[index];
-                            final metadata = doc['metadata'] ?? {};
+                            final data = doc.data();
+
+                            // SAFELY cast metadata
+                            Map<String, dynamic> metadata = {};
+                            if (data is Map<String, dynamic> &&
+                                data['metadata'] is Map<String, dynamic>) {
+                              metadata = Map<String, dynamic>.from(
+                                data['metadata'],
+                              );
+                            }
+
                             final status =
-                                (doc['status'] ?? 'pending').toString();
+                                (data is Map<String, dynamic> &&
+                                        data['status'] != null)
+                                    ? data['status'].toString()
+                                    : 'pending';
+
                             return buildListTile(
                               docId: doc.id,
                               metadata: metadata,

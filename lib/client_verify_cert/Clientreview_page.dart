@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'firestore_service.dart';
+import '../client_verify_cert/firestore_service.dart';
+import '../client_verify_cert/widget/metadata.dart';
+
 
 class StatusBanner extends StatelessWidget {
   final String status;
@@ -54,28 +56,30 @@ class _ReviewPageState extends State<ReviewPage> {
   }
 
   Future<void> loadDocument() async {
-    try {
-      final doc = await FirebaseFirestore.instance
-          .collection('truecopies')
-          .doc(widget.docId)
-          .get();
+  try {
+    final doc = await FirebaseFirestore.instance
+        .collection('clientPage')
+        .doc(widget.docId)
+        .get();
 
-      if (doc.exists) {
-        setState(() {
-          metadata = Map<String, dynamic>.from(doc['metadata'] ?? {});
-          status = (doc['status']?.toString().toLowerCase() ?? 'pending');
-          isLoading = false;
-        });
-      } else {
-        throw Exception("Document not found.");
-      }
-    } catch (e) {
-      setState(() => isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load document: $e')),
-      );
+    if (doc.exists) {
+      final data = doc.data() as Map<String, dynamic>;
+      setState(() {
+        metadata = Map<String, dynamic>.from(data['metadata'] ?? {});
+        status = (data['status']?.toString().toLowerCase() ?? 'pending');
+        isLoading = false;
+      });
+    } else {
+      throw Exception("Document not found.");
     }
+  } catch (e) {
+    setState(() => isLoading = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to load document: $e')),
+    );
   }
+}
+
 
   Future<void> updateStatus(BuildContext context, String newStatus) async {
     try {
@@ -121,73 +125,36 @@ class _ReviewPageState extends State<ReviewPage> {
   }
 
   Widget buildCertificateCard() {
-    final recipient = metadata['recipientName'] ?? metadata['name'] ?? 'Unknown Recipient';
-    final issuer = metadata['organizationName'] ?? metadata['organization'] ?? 'Unknown Issuer';
-    final course = metadata['courseName'] ?? metadata['document_type'] ?? 'Course';
-    final issuedDate = metadata['issuedDate'] ?? metadata['date_issued'] ?? 'N/A';
-    final expiryDate = metadata['expiryDate'] ?? metadata['expiry_date'] ?? 'N/A';
+  return Container(
+    padding: EdgeInsets.all(20),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      border: Border.all(color: Colors.black, width: 2),
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.2),
+          blurRadius: 10,
+          offset: Offset(0, 4),
+        ),
+      ],
+    ),
+    width: double.infinity,
+    child: Column( // 👈 Here is where your content goes
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          'Certificate of Completion',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 20),
+        MetadataSection(metadata: metadata), // 👈 Your widget
+      ],
+    ),
+  );
+}
 
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.black, width: 2),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      width: double.infinity,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            issuer,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 20),
-          Text(
-            'Certificate of Completion',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 20),
-          Text('This is to certify that', style: TextStyle(fontSize: 16)),
-          SizedBox(height: 10),
-          Text(
-            recipient,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.blueAccent,
-            ),
-          ),
-          SizedBox(height: 10),
-          Text(
-            'has successfully completed the course',
-            style: TextStyle(fontSize: 16),
-          ),
-          SizedBox(height: 10),
-          Text(
-            course,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-          ),
-          SizedBox(height: 20),
-          Text('Issued on: $issuedDate', style: TextStyle(fontSize: 14)),
-          SizedBox(height: 4),
-          Text('Valid until: $expiryDate', style: TextStyle(fontSize: 14)),
-        ],
-      ),
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
