@@ -44,7 +44,7 @@ class ClientScreen extends StatelessWidget {
           ClientDetail(
             icon: Icons.document_scanner_outlined,
             label: "Request Certificate Issuance",
-            destination: Requestcert(), // nnti adjust navigation dia
+            destination: Requestcert(),
           ),
           const SizedBox(height: 24),
           ClientDetail(

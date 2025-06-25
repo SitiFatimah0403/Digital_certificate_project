@@ -51,17 +51,5 @@ class ClientDetail extends StatelessWidget {
   }
 }
 
-// Placeholder (nanti boleh delete ni)
-class RequestPage extends StatelessWidget {
-  const RequestPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Request Certificate Issuance")),
-      body: const Center(child: Text("Request Certificate Page Content Here")),
-    );
-  }
-}
 
 
