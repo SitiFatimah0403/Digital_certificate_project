@@ -10,7 +10,7 @@ class DummyCertView extends StatelessWidget {
       {
         'Name': 'Jungkooks Certificate',
         'issuanceDate': 'April 25, 2025',
-        'file': 'cert1.pdf',
+        'file': 'dummy_certificate.pdf',
       },
     ];
 

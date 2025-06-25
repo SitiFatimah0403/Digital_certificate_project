@@ -30,7 +30,6 @@ class _AccessSharedLinksScreenState extends State<AccessSharedLinksScreen> {
       SnackBar(content: Text("Accessing certificate from:\n$link")),
     );
 
-    // TODO: Implement actual link navigation or API call
   }
 
   @override

@@ -29,7 +29,7 @@ class _VerifyCertificateScreenState extends State<VerifyCertificateScreen> {
       _result = "✔ Certificate $certId is VALID and VERIFIED.";
     });
 
-    // TODO: Implement actual API call or certificate lookup
+    // sebenranya nak buat benda ni kena ada API, so API letak sini
   }
 
   @override
