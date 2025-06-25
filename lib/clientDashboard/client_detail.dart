@@ -64,15 +64,4 @@ class RequestPage extends StatelessWidget {
   }
 }
 
-// Placeholder (nanti boleh delete ni)
-class ReviewPage extends StatelessWidget {
-  const ReviewPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Review and Approve Certificates")),
-      body: const Center(child: Text("Review and Approve Page Content Here")),
-    );
-  }
-}

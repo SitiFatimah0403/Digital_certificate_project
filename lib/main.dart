@@ -22,16 +22,18 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 
 
 
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // enable debug App Check
-  await FirebaseAppCheck.instance.activate(
+await FirebaseAppCheck.instance.activate(
   androidProvider: AndroidProvider.debug,
-
-
+  //isTokenAutoRefreshEnabled: true,
 );
+
 
 //Nk check appchecker tu
 FirebaseAppCheck.instance.getToken(true).then((token) {
@@ -67,11 +69,11 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginScreen(),
         '/Signup': (context) => SignUpScreen(),
-        '/adminDashboard': (context) => PlaceholderScreen('Admin Dashboard'),
+        '/adminDashboard': (context) => PlaceholderScreen('Admin Dashboard'),// ni tak de
         '/caDashboard': (context) => CertificateApp(),
         '/recipientDashboard': (context) => BottomNavbar(),
         '/clientDashboard': (context) => ClientScreen(),
-        '/viewerDashboard': (context) => PlaceholderScreen('Viewer'),
+        '/viewerDashboard': (context) => PlaceholderScreen('Viewer'), // ni un tak de
       },
     );
   }
