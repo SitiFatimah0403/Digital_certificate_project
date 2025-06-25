@@ -7,6 +7,7 @@ import 'package:digital_certificate_project/recipient_verify_cert/CA_verificatio
 import 'package:digital_certificate_project/recipientDashboard/base/bottom_navbar.dart';
 import 'package:digital_certificate_project/recipientDashboard/screen/home_screen.dart';
 import 'package:digital_certificate_project/recipient_verify_cert/CA_verification.dart';
+import 'package:digital_certificate_project/viewerDashboard/screen/viewerScreen.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -36,12 +37,12 @@ await FirebaseAppCheck.instance.activate(
 
 
 //Nk check appchecker tu
-FirebaseAppCheck.instance.getToken(true).then((token) {
+/*FirebaseAppCheck.instance.getToken(true).then((token) {
   print('🛡️ Debug token: $token');
 }).catchError((error) {
   print('❌ Failed to get token: $error');
 });
-
+*/
 
 
   print(Firebase.apps); 
@@ -64,8 +65,8 @@ class MyApp extends StatelessWidget {
       title: 'Digital Certificate Repository',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.grey),
-      home: AuthWrapper(), // controls where to go after startup
-      //home: UploadScreen(), // temporary to test UploadScreen
+      //home: AuthWrapper(), // controls where to go after startup
+      home: Viewerscreen(), // temporary to test UploadScreen
       routes: {
         '/login': (context) => LoginScreen(),
         '/Signup': (context) => SignUpScreen(),
@@ -73,7 +74,7 @@ class MyApp extends StatelessWidget {
         '/caDashboard': (context) => CertificateApp(),
         '/recipientDashboard': (context) => BottomNavbar(),
         '/clientDashboard': (context) => ClientScreen(),
-        '/viewerDashboard': (context) => PlaceholderScreen('Viewer'), // ni un tak de
+        '/viewerDashboard': (context) => Viewerscreen(), 
       },
     );
   }
