@@ -569,6 +569,11 @@ class GenerateCertFirestorePage extends StatelessWidget {
             itemCount: dataList.length,
             itemBuilder: (context, index) {
               final data = dataList[index];
+              final timestamp = data['uploadedAt'];
+              final readableTime = timestamp is Timestamp
+                  ? DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch).toLocal().toString()
+                  : 'N/A';
+
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 child: Padding(
@@ -581,6 +586,8 @@ class GenerateCertFirestorePage extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text("Event: ${data['title'] ?? 'No title'}"),
                       Text("Issuance Date: ${data['date'] ?? 'No date'}"),
+                      if (timestamp != null)
+                        Text("Uploaded At: $readableTime", style: TextStyle(color: Colors.grey[700])),
                       const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
