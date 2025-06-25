@@ -1,5 +1,7 @@
+import 'package:digital_certificate_project/auth/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'signin_screen.dart';
 import '../../Components/round_logo.dart';
 import '../services/auth_service.dart';
@@ -22,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final FirestoreUserService firestoreService = FirestoreUserService();
 
   // Google Sign-In logic
-void _handleGoogleSignIn() async {
+/*void _handleGoogleSignIn() async {
   try {
     final user = await AuthService().signInWithGoogle();
 
@@ -70,7 +72,76 @@ void _handleGoogleSignIn() async {
       SnackBar(content: Text('Google Sign-In failed: $e')),
     );
   }
+}*/
+
+//try new google sign in
+void _handleGoogleSignIn() async {
+  try {
+    // Sign out any existing sessions first
+    await GoogleSignIn().signOut();
+    await FirebaseAuth.instance.signOut();
+
+    final user = await AuthService().signInWithGoogle();
+
+    if (user != null) {
+      final email = user.email!;
+      final uid = user.uid;
+
+      // Check if the user already exists
+      final existingUser = await firestoreService.getUserByEmail(email);
+
+      if (existingUser == null) {
+        // Register user in Firestore with default role
+        await firestoreService.saveUser(
+          AppUser(uid: uid, email: email, role: 'recipient'),
+        );
+      }
+
+      // Get user role
+      final role = await firestoreService.getUserRole(email);
+
+      if (role != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Google Sign-In successful!')),
+        );
+
+        // Redirect based on role
+        switch (role) {
+          case 'recipient':
+            Navigator.pushReplacementNamed(context, '/recipientDashboard');
+            break;
+          case 'CA':
+            Navigator.pushReplacementNamed(context, '/caDashboard');
+            break;
+          case 'Client':
+            Navigator.pushReplacementNamed(context, '/clientDashboard');
+            break;
+          case 'Admin':
+            Navigator.pushReplacementNamed(context, '/adminDashboard');
+            break;
+          case 'Viewer':
+            Navigator.pushReplacementNamed(context, '/viewerDashboard');
+            break;
+          default:
+            Navigator.pushReplacementNamed(context, '/recipientDashboard');
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No role found for this user.')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Google sign-in failed.')),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Google Sign-In error: $e')),
+    );
+  }
 }
+
 
 
   // Email/password login

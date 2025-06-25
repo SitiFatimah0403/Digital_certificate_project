@@ -1,39 +1,32 @@
-/*
-This class is for:
-1) save user data in firestore cloud
-2) Maneage RBAC (role based access control)
-*/
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AppUser {
-  final String uid; //for firebase unique ID
+  final String uid;
   final String email;
-  final String password;
-  final String role; //role as : ca, admin , recipient , client , viewer
+  final String? password; // Make optional
+  final String role;
 
   AppUser({
     required this.uid,
     required this.email,
-    required this.password,
+    this.password, // Optional for Google Sign-In
     required this.role,
   });
 
-
-  factory AppUser.fromMap(Map<String, dynamic> data) { //read from Firestore
+  factory AppUser.fromMap(Map<String, dynamic> data) {
     return AppUser(
       uid: data['uid'],
       email: data['email'],
-      password: data['password'],
+      password: data['password'], // May be null
       role: data['role'],
     );
   }
 
-  Map<String, dynamic> toMap() { //Save to firestore
+  Map<String, dynamic> toMap() {
     return {
       'uid': uid,
       'email': email,
-      'password': password,
+      if (password != null) 'password': password, // Only save if not null
       'role': role,
       'created_at': FieldValue.serverTimestamp(),
     };
