@@ -21,7 +21,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:digital_certificate_project/recipient_upload_cert/upload_cert.dart'; //temporary
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:digital_certificate_project/viewerDashboard/widget/access_shared_links.dart';
-import 'package:digital_certificate_project/viewerDashboard/widget/authenticate_access.dart';
 import 'package:digital_certificate_project/viewerDashboard/widget/verify_certificate.dart';
 
 
@@ -76,7 +75,6 @@ class MyApp extends StatelessWidget {
         '/clientDashboard': (context) => ClientScreen(),
         '/viewerDashboard': (context) => Viewerscreen(), 
         '/sharedLinks': (context) => const AccessSharedLinksScreen(),
-        '/authenticateAccess': (context) => const AuthenticateAccessScreen(),
         '/verifyCertificate': (context) => const VerifyCertificateScreen(),
       },
     );
