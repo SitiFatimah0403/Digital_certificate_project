@@ -1,4 +1,5 @@
 import 'package:digital_certificate_project/auth/services/auth_service.dart';
+import 'package:digital_certificate_project/clientDashboard/requestCert.dart';
 import 'package:flutter/material.dart';
 import 'client_detail.dart';
 import '../client_verify_cert/CA_ClientVerification.dart';
@@ -43,7 +44,7 @@ class ClientScreen extends StatelessWidget {
           ClientDetail(
             icon: Icons.document_scanner_outlined,
             label: "Request Certificate Issuance",
-            destination: const RequestPage(), // nnti adjust navigation dia
+            destination: Requestcert(), // nnti adjust navigation dia
           ),
           const SizedBox(height: 24),
           ClientDetail(
