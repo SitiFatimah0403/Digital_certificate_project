@@ -69,11 +69,11 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginScreen(),
         '/Signup': (context) => SignUpScreen(),
-        '/adminDashboard': (context) => PlaceholderScreen('Admin Dashboard'),
+        '/adminDashboard': (context) => PlaceholderScreen('Admin Dashboard'),// ni tak de
         '/caDashboard': (context) => CertificateApp(),
         '/recipientDashboard': (context) => BottomNavbar(),
         '/clientDashboard': (context) => ClientScreen(),
-        '/viewerDashboard': (context) => PlaceholderScreen('Viewer'),
+        '/viewerDashboard': (context) => PlaceholderScreen('Viewer'), // ni un tak de
       },
     );
   }
