@@ -36,12 +36,12 @@ await FirebaseAppCheck.instance.activate(
 
 
 //Nk check appchecker tu
-/*FirebaseAppCheck.instance.getToken(true).then((token) {
+FirebaseAppCheck.instance.getToken(true).then((token) {
   print('🛡️ Debug token: $token');
 }).catchError((error) {
   print('❌ Failed to get token: $error');
 });
-*/
+
 
 
   print(Firebase.apps); 
@@ -74,8 +74,8 @@ class MyApp extends StatelessWidget {
         '/recipientDashboard': (context) => BottomNavbar(),
         '/clientDashboard': (context) => ClientScreen(),
         '/viewerDashboard': (context) => Viewerscreen(), 
-        '/sharedLinks': (context) => const AccessSharedLinksScreen(),
-        '/verifyCertificate': (context) => const VerifyCertificateScreen(),
+        '/sharedLinks': (context) => const AccessSharedLinksScreen(),     //under viewer dashbboard
+        '/verifyCertificate': (context) => const VerifyCertificateScreen(), //under viewer dashboard
       },
     );
   }
