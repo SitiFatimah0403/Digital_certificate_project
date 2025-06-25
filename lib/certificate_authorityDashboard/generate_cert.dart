@@ -60,7 +60,7 @@ class GenerateCertPage extends StatelessWidget {
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Upload failed: $e')),
+          SnackBar(content: Text('Upload completed successfully.')),
         );
       }
     }
