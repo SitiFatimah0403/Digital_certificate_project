@@ -2,15 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:intl/intl.dart';
 
 class GenerateCertPage extends StatelessWidget {
   const GenerateCertPage({super.key});
 
   Future<List<Map<String, dynamic>>> fetchRequestCertData() async {
-    final snapshot = await FirebaseFirestore.instance.collection('requestCert').get();
-    return snapshot.docs
-        .map((doc) => doc.data() as Map<String, dynamic>)
-        .toList();
+    try {
+      print("📡 Fetching data from Firestore...");
+      final snapshot = await FirebaseFirestore.instance.collection('requestCert').get();
+
+      if (snapshot.docs.isEmpty) {
+        print("⚠️ No documents found in 'requestCert'.");
+      } else {
+        print("✅ Found ${snapshot.docs.length} document(s):");
+        for (var doc in snapshot.docs) {
+          print("📝 Document ID: ${doc.id} => ${doc.data()}");
+        }
+      }
+
+      return snapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+    } catch (e) {
+      print("❌ Error fetching data: $e");
+      return [];
+    }
   }
 
   void _uploadFile(BuildContext context, Map<String, dynamic> data) async {
@@ -29,10 +46,9 @@ class GenerateCertPage extends StatelessWidget {
         await storageRef.putData(file.bytes!);
         final downloadUrl = await storageRef.getDownloadURL();
 
-        // Optional: store uploaded cert info back in Firestore
-        await FirebaseFirestore.instance.collection('uploadedCerts').add({
+        await FirebaseFirestore.instance.collection('issuedCerts').add({
           'name': data['name'],
-          'event': data['title'],
+          'title': data['title'],
           'issuanceDate': data['date'],
           'fileUrl': downloadUrl,
           'fileType': file.extension,
@@ -74,6 +90,11 @@ class GenerateCertPage extends StatelessWidget {
             itemCount: dataList.length,
             itemBuilder: (context, index) {
               final data = dataList[index];
+              final timestamp = data['timestamp'] as Timestamp?;
+              final formattedTimestamp = timestamp != null
+                  ? DateFormat('dd MMMM yyyy – hh:mm a').format(timestamp.toDate())
+                  : 'No time';
+
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 child: Padding(
@@ -86,6 +107,7 @@ class GenerateCertPage extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text("Event: ${data['title'] ?? 'No title'}"),
                       Text("Issuance Date: ${data['date'] ?? 'No date'}"),
+                      Text("Time requested: $formattedTimestamp"),
                       const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -108,5 +130,7 @@ class GenerateCertPage extends StatelessWidget {
     );
   }
 }
+
+
 
 
