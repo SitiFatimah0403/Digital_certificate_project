@@ -64,8 +64,8 @@ class MyApp extends StatelessWidget {
       title: 'Digital Certificate Repository',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.grey),
-      //home: AuthWrapper(), // controls where to go after startup
-      home: Viewerscreen(), // temporary to test UploadScreen
+      home: AuthWrapper(), // controls where to go after startup
+      //home: Viewerscreen(), // temporary to test UploadScreen
       routes: {
         '/login': (context) => LoginScreen(),
         '/Signup': (context) => SignUpScreen(),
