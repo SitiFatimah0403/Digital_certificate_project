@@ -8,7 +8,7 @@ class DummyCertView extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> certs = [
       {
-        'Name': 'Jungkook''s Certificate',
+        'Name': 'Jungkooks Certificate',
         'issuanceDate': 'April 25, 2025',
         'file': 'cert1.pdf',
       },
