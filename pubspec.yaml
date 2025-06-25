@@ -85,7 +85,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   pdfx: ^2.5.0
   share_plus: ^7.2.1
-  #syncfusion_flutter_pdfviewer: any
+
 
 
 dev_dependencies:
