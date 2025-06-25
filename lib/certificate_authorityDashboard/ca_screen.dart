@@ -329,7 +329,7 @@ class _HomePageState extends State<HomePage> {
   void _goToGenerateCertPage() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => GenerateCertPage(clients: clients)),
+      MaterialPageRoute(builder: (_) => GenerateCertPage()),
     );
   }
 
@@ -499,11 +499,16 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class GenerateCertPage extends StatelessWidget {
-  final List<Client> clients;
-  const GenerateCertPage({super.key, required this.clients});
+class GenerateCertFirestorePage extends StatelessWidget {
+  const GenerateCertFirestorePage({super.key});
 
-  void _uploadFile(BuildContext context, Client client) async {
+  Future<List<Map<String, dynamic>>> fetchRequestCertData() async {
+    final snapshot = await FirebaseFirestore.instance.collection('requestCert').get();
+    print("📄 Documents fetched: ${snapshot.docs.length}");
+    return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+  }
+
+  void _uploadFile(BuildContext context, Map<String, dynamic> data) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
@@ -512,23 +517,24 @@ class GenerateCertPage extends StatelessWidget {
 
     if (result != null && result.files.single.bytes != null) {
       final file = result.files.first;
-      final fileName = '${client.name}_${DateTime.now().millisecondsSinceEpoch}.${file.extension}';
+      final fileName = '${data['name']}_${DateTime.now().millisecondsSinceEpoch}.${file.extension}';
       final storageRef = FirebaseStorage.instance.ref().child('certificates/$fileName');
 
       try {
         await storageRef.putData(file.bytes!);
         final downloadUrl = await storageRef.getDownloadURL();
 
-        await FirebaseFirestore.instance.collection('clients').add({
-          'name': client.name,
-          'event': client.event,
-          'issuanceDate': client.issuanceDate,
+        await FirebaseFirestore.instance.collection('requestCert').add({
+          'name': data['name'],
+          'event': data['title'],
+          'issuanceDate': data['date'],
           'fileUrl': downloadUrl,
           'fileType': file.extension,
+          'uploadedAt': Timestamp.now(),
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Uploaded & saved for ${client.name}')),
+          SnackBar(content: Text('Uploaded & saved for ${data['name']}')),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -538,57 +544,66 @@ class GenerateCertPage extends StatelessWidget {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
+    print("🧱 GenerateCertFirestorePage build() called");
     return Scaffold(
-      appBar: AppBar(title: Text('Confirm Certificate Info'), centerTitle: true),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.white, Colors.white],
-          ),
-        ),
-        child: ListView.builder(
-          padding: EdgeInsets.all(16),
-          itemCount: clients.length,
-          itemBuilder: (context, index) {
-            final client = clients[index];
-            return Card(
-              margin: EdgeInsets.symmetric(vertical: 10),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(client.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 8),
-                    Text("Event: ${client.event}"),
-                    Text("Issuance Date: ${client.issuanceDate}"),
-                    SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ElevatedButton.icon(
-                          icon: Icon(Icons.upload_file),
-                          label: Text("Upload Cert"),
-                          onPressed: () => _uploadFile(context, client),
-                        ),
+      appBar: AppBar(title: Text('Request Certificates'), centerTitle: true),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: fetchRequestCertData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
 
-                      ],
-                    ),
-                  ],
+          final dataList = snapshot.data!;
+          if (dataList.isEmpty) {
+            return const Center(child: Text('No certificate requests found.'));
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: dataList.length,
+            itemBuilder: (context, index) {
+              final data = dataList[index];
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 10),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(data['name'] ?? '',
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
+                      Text("Event: ${data['title'] ?? 'No title'}"),
+                      Text("Issuance Date: ${data['date'] ?? 'No date'}"),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.upload_file),
+                            label: const Text("Upload Cert"),
+                            onPressed: () => _uploadFile(context, data),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
+              );
+            },
+          );
+        },
       ),
     );
   }
 }
+
 
 class ViewAllPage extends StatelessWidget {
   final List<Client> clients;

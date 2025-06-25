@@ -7,11 +7,28 @@ class GenerateCertPage extends StatelessWidget {
   const GenerateCertPage({super.key});
 
   Future<List<Map<String, dynamic>>> fetchRequestCertData() async {
-    final snapshot = await FirebaseFirestore.instance.collection('requestCert').get();
-    return snapshot.docs
-        .map((doc) => doc.data() as Map<String, dynamic>)
-        .toList();
+    try {
+      print("📡 Fetching data from Firestore...");
+      final snapshot = await FirebaseFirestore.instance.collection('requestCert').get();
+
+      if (snapshot.docs.isEmpty) {
+        print("⚠️ No documents found in 'requestCert'.");
+      } else {
+        print("✅ Found ${snapshot.docs.length} document(s):");
+        for (var doc in snapshot.docs) {
+          print("📝 Document ID: ${doc.id} => ${doc.data()}");
+        }
+      }
+
+      return snapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+    } catch (e) {
+      print("❌ Error fetching data: $e");
+      return [];
+    }
   }
+
 
   void _uploadFile(BuildContext context, Map<String, dynamic> data) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -29,10 +46,10 @@ class GenerateCertPage extends StatelessWidget {
         await storageRef.putData(file.bytes!);
         final downloadUrl = await storageRef.getDownloadURL();
 
-        // Optional: store uploaded cert info back in Firestore
-        await FirebaseFirestore.instance.collection('uploadedCerts').add({
+        // Save certificate metadata to a separate collection (not requestCert!)
+        await FirebaseFirestore.instance.collection('issuedCerts').add({
           'name': data['name'],
-          'event': data['title'],
+          'title': data['title'],           // Use original field name
           'issuanceDate': data['date'],
           'fileUrl': downloadUrl,
           'fileType': file.extension,
@@ -108,5 +125,6 @@ class GenerateCertPage extends StatelessWidget {
     );
   }
 }
+
 
 
