@@ -87,7 +87,6 @@ dependencies:
   share_plus: ^7.2.1
 
 
-
 dev_dependencies:
   mockito: ^5.4.4
   #firebase_auth_mocks: ^0.13.0
