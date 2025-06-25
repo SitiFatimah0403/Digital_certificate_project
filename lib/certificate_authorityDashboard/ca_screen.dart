@@ -398,24 +398,24 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _goToLtcPage,
-                      style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(vertical: 16)),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.verified_user, size: 20),
-                          SizedBox(height: 6),
-                          Text(
-                            'CTC',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  // Expanded(
+                  //   child: ElevatedButton(
+                  //     onPressed: _goToLtcPage,
+                  //     style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(vertical: 16)),
+                  //     child: Column(
+                  //       mainAxisSize: MainAxisSize.min,
+                  //       children: [
+                  //         Icon(Icons.verified_user, size: 20),
+                  //         SizedBox(height: 6),
+                  //         Text(
+                  //           'CTC',
+                  //           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  //           textAlign: TextAlign.center,
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton(
