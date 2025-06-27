@@ -264,7 +264,7 @@ void _handleGoogleSignIn() async {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
+                backgroundColor: const Color(0xFF096192),
                 minimumSize: Size(double.infinity, 44),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),

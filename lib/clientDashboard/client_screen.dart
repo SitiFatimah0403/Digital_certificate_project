@@ -13,7 +13,7 @@ class ClientScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(181, 0, 0, 0),
+        backgroundColor: const Color(0xFF096192),
         title: const Text(
           "CLIENT",
           style: TextStyle(

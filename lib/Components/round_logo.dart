@@ -42,7 +42,7 @@ class _RoundLogoWidgetState extends State<RoundLogoWidget> {
       width: widget.size,
       height: widget.size,
       decoration: BoxDecoration(
-        color: Colors.black,
+        color: const Color(0xFF096192),
         borderRadius: BorderRadius.circular(widget.size / 2),
       ),
       alignment: Alignment.center,
