@@ -75,7 +75,7 @@ class CertificateApp extends StatelessWidget {
         ),
         appBarTheme: const AppBarTheme(
           elevation: 0,
-          backgroundColor: Color.fromARGB(181, 0, 0, 0), // Your custom black color
+          backgroundColor: const Color(0xFF096192), // Your custom black color
           foregroundColor: Colors.white,
           titleTextStyle: TextStyle(
             color: Colors.white,
@@ -398,24 +398,24 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _goToLtcPage,
-                      style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(vertical: 16)),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.verified_user, size: 20),
-                          SizedBox(height: 6),
-                          Text(
-                            'CTC',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  // Expanded(
+                  //   child: ElevatedButton(
+                  //     onPressed: _goToLtcPage,
+                  //     style: ElevatedButton.styleFrom(padding: EdgeInsets.symmetric(vertical: 16)),
+                  //     child: Column(
+                  //       mainAxisSize: MainAxisSize.min,
+                  //       children: [
+                  //         Icon(Icons.verified_user, size: 20),
+                  //         SizedBox(height: 6),
+                  //         Text(
+                  //           'CTC',
+                  //           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  //           textAlign: TextAlign.center,
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton(
